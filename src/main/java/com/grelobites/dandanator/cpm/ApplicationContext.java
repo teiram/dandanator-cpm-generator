@@ -1,6 +1,6 @@
 package com.grelobites.dandanator.cpm;
 
-import com.grelobites.dandanator.cpm.model.Installable;
+import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.OperationResult;
@@ -36,9 +36,9 @@ import java.util.concurrent.Future;
 public class ApplicationContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationContext.class);
     private Stage applicationStage;
-    private final ObservableList<Installable> installableList;
-    private ReadOnlyObjectProperty<Installable> selectedInstallable;
-    private BooleanProperty installableSelected;
+    private final ObservableList<Archive> archiveList;
+    private ReadOnlyObjectProperty<Archive> selectedArchive;
+    private BooleanProperty archiveSelected;
     private StringProperty romUsageDetail;
     private DoubleProperty romUsage;
     private IntegerProperty backgroundTaskCount;
@@ -54,27 +54,27 @@ public class ApplicationContext {
     });
 
     public ApplicationContext() {
-        this.installableList = FXCollections.observableArrayList(Installable::getObservables);
-        this.installableSelected = new SimpleBooleanProperty(false);
+        this.archiveList = FXCollections.observableArrayList(Archive::getObservables);
+        this.archiveSelected = new SimpleBooleanProperty(false);
         this.romUsage = new SimpleDoubleProperty();
         this.romUsageDetail = new SimpleStringProperty();
         this.backgroundTaskCount = new SimpleIntegerProperty();
     }
 
-    public ObservableList<Installable> getInstallableList() {
-        return installableList;
+    public ObservableList<Archive> getArchiveList() {
+        return archiveList;
     }
 
-    public boolean getInstallableSelected() {
-        return installableSelected.get();
+    public boolean getArchiveSelected() {
+        return archiveSelected.get();
     }
 
-    public void setInstallableSelected(boolean installableSelected) {
-        this.installableSelected.set(installableSelected);
+    public void setArchiveSelected(boolean archiveSelected) {
+        this.archiveSelected.set(archiveSelected);
     }
 
-    public BooleanProperty installableSelectedProperty() {
-        return installableSelected;
+    public BooleanProperty archiveSelectedProperty() {
+        return archiveSelected;
     }
 
     public DirectoryAwareFileChooser getFileChooser() {
@@ -125,13 +125,13 @@ public class ApplicationContext {
         this.romSetHandler = romSetHandler;
     }
 
-    public ReadOnlyObjectProperty<Installable> selectedInstallableProperty() {
-        return selectedInstallable;
+    public ReadOnlyObjectProperty<Archive> selectedArchiveProperty() {
+        return selectedArchive;
     }
 
-    public void setSelectedInstallableProperty(ReadOnlyObjectProperty<Installable> selectedInstallableProperty) {
-        selectedInstallable = selectedInstallableProperty;
-        installableSelected.bind(selectedInstallable.isNotNull());
+    public void setSelectedArchiveProperty(ReadOnlyObjectProperty<Archive> selectedInstallableProperty) {
+        selectedArchive = selectedInstallableProperty;
+        archiveSelected.bind(selectedArchive.isNotNull());
     }
 
     public Stage getApplicationStage() {
@@ -143,15 +143,15 @@ public class ApplicationContext {
     }
 
     public void exportCurrentInstallable() {
-        Installable installable = selectedInstallable.get();
-        if (installable != null) {
+        Archive archive = selectedArchive.get();
+        if (archive != null) {
             DirectoryAwareFileChooser chooser = getFileChooser();
             chooser.setTitle(LocaleUtil.i18n("exportCurrentInstallable"));
-            chooser.setInitialFileName(installable.getName());
+            chooser.setInitialFileName(archive.getName());
             final File saveFile = chooser.showSaveDialog(applicationStage.getScene().getWindow());
             if (saveFile != null) {
                 try {
-                    installable.exportAsFile(saveFile);
+                    archive.exportAsFile(saveFile);
                 } catch (IOException e) {
                     LOGGER.error("Exporting Installable", e);
                 }
@@ -173,7 +173,7 @@ public class ApplicationContext {
     }
 
     public void importRomSet(File romSetFile) throws IOException {
-        if (getInstallableList().isEmpty() || confirmRomSetDeletion()) {
+        if (getArchiveList().isEmpty() || confirmRomSetDeletion()) {
             try (InputStream is = new FileInputStream(romSetFile)) {
                 romSetHandler.importRomSet(is);
             }

@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-public class Installable {
+public class Archive {
     private StringProperty name;
     private byte[] data;
 
@@ -31,7 +31,7 @@ public class Installable {
 
     }
 
-    public static Optional<Installable> fromFile(String installableName, File file) {
+    public static Optional<Archive> fromFile(String archiveName, File file) {
         return Optional.empty();
     }
 }

@@ -55,7 +55,9 @@
                               <HBox alignment="CENTER" fillHeight="false" spacing="5.0">
                                  <children>
                                     <Label maxWidth="1.7976931348623157E308" text="%archiveName" HBox.hgrow="ALWAYS" />
-                                    <TextField fx:id="archiveName" />
+                                    <TextField fx:id="archiveName" prefColumnCount="8" />
+                                    <Label text="." />
+                                    <TextField fx:id="archiveExtension" prefColumnCount="3" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" fillHeight="false">

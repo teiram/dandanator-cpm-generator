@@ -12,7 +12,7 @@ public interface RomSetHandler {
     
     void exportRomSet(OutputStream romset) throws IOException;
 
-    void removeInstallable(Installable installable);
+    void removeArchive(Archive archive);
 
-    void addInstallable(Installable installable);
+    void addArchive(Archive archive);
 }

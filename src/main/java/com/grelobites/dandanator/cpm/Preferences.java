@@ -5,6 +5,8 @@ import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 public class Preferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
@@ -33,7 +35,10 @@ public class Preferences {
         return new Preferences();
     }
 
-    public byte[] getBootImage() {
+    public byte[] getBootImage() throws IOException {
+        if (bootImage == null) {
+            bootImage = Constants.getDefaultBootScreen();
+        }
         return bootImage;
     }
 

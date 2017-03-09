@@ -14,7 +14,7 @@ public class Constants {
 	public static final int SPECTRUM_COLORINFO_SIZE = 768;
 	public static final int SPECTRUM_FULLSCREEN_SIZE = SPECTRUM_SCREEN_SIZE +
 			SPECTRUM_COLORINFO_SIZE;
-    private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "menu.scr";
+    private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
     private static final String THEME_RESOURCE = "view/theme.css";
 
     private static byte[] DEFAULT_BOOT_IMAGE;

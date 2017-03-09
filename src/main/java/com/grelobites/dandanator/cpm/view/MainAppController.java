@@ -2,9 +2,8 @@ package com.grelobites.dandanator.cpm.view;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
-import com.grelobites.dandanator.cpm.model.Installable;
+import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
-import com.grelobites.dandanator.cpm.util.InstallableUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.OperationResult;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
@@ -14,13 +13,11 @@ import javafx.beans.binding.Bindings;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
-import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,22 +38,22 @@ public class MainAppController {
     private Pane applicationPane;
 
     @FXML
-    private TableView<Installable> installableTable;
+    private TableView<Archive> archiveTable;
 
     @FXML
-    private TableColumn<Installable, String> nameColumn;
+    private TableColumn<Archive, String> archiveNameColumn;
 
     @FXML
     private Button createRomButton;
 
     @FXML
-    private Button addInstallableButton;
+    private Button addArchiveButton;
 
     @FXML
-    private Button removeSelectedInstallableButton;
+    private Button removeSelectedArchiveButton;
 
     @FXML
-    private Button clearRomsetButton;
+    private Button purgeArchivesButton;
 
     @FXML
     private ProgressIndicator operationInProgressIndicator;
@@ -76,7 +73,7 @@ public class MainAppController {
         return applicationContext.getRomSetHandler();
     }
 
-    private String getInstallableName(File file) {
+    private String getArchiveName(File file) {
         //TODO: Avoid collisions with other names in the list and adhere to CP/M conventions
         return file.getName();
     }
@@ -84,13 +81,13 @@ public class MainAppController {
     private void addInstallablesFromFiles(List<File> files) {
         files.forEach(file ->
             applicationContext.addBackgroundTask(() -> {
-                Optional<Installable> installableOptional = Installable.fromFile(getInstallableName(file), file);
-                if (installableOptional.isPresent()) {
-                    Platform.runLater(() -> getRomSetHandler().addInstallable(installableOptional.get()));
+                Optional<Archive> archiveOptional = Archive.fromFile(getArchiveName(file), file);
+                if (archiveOptional.isPresent()) {
+                    Platform.runLater(() -> getRomSetHandler().addArchive(archiveOptional.get()));
                 } else {
                     Platform.runLater(() -> {
                         try (FileInputStream fis = new FileInputStream(file)) {
-                            if (getApplicationContext().getInstallableList().isEmpty()) {
+                            if (getApplicationContext().getArchiveList().isEmpty()) {
                                 getRomSetHandler().importRomSet(fis);
                             } else {
                                 getRomSetHandler().mergeRomSet(fis);
@@ -111,22 +108,22 @@ public class MainAppController {
 
     @FXML
     private void initialize() throws IOException {
-        applicationContext.setSelectedInstallableProperty(installableTable.getSelectionModel().selectedItemProperty());
+        applicationContext.setSelectedArchiveProperty(archiveTable.getSelectionModel().selectedItemProperty());
 
-       clearRomsetButton.disableProperty()
-                .bind(Bindings.size(applicationContext.getInstallableList())
+       purgeArchivesButton.disableProperty()
+                .bind(Bindings.size(applicationContext.getArchiveList())
                         .isEqualTo(0));
 
-        installableTable.setItems(applicationContext.getInstallableList());
-        installableTable.setPlaceholder(new Label(LocaleUtil.i18n("dropInstallablesMessage")));
+        archiveTable.setItems(applicationContext.getArchiveList());
+        archiveTable.setPlaceholder(new Label(LocaleUtil.i18n("dropArchivesMessage")));
 
         operationInProgressIndicator.visibleProperty().bind(
                 applicationContext.backgroundTaskCountProperty().greaterThan(0));
 
-        onInstallableSelection(null, null);
+        onArchiveSelection(null, null);
 
-        installableTable.setRowFactory(rf -> {
-            TableRow<Installable> row = new TableRow<>();
+        archiveTable.setRowFactory(rf -> {
+            TableRow<Archive> row = new TableRow<>();
             row.setOnDragDetected(event -> {
                 if (!row.isEmpty()) {
                     Integer index = row.getIndex();
@@ -155,20 +152,20 @@ public class MainAppController {
                 LOGGER.debug("row.setOnDragDropped: " + db);
                 if (db.hasContent(SERIALIZED_MIME_TYPE)) {
                     int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-                    Installable draggedInstallable = installableTable.getItems().remove(draggedIndex);
+                    Archive draggedArchive = archiveTable.getItems().remove(draggedIndex);
 
                     int dropIndex ;
 
                     if (row.isEmpty()) {
-                        dropIndex = installableTable.getItems().size();
+                        dropIndex = archiveTable.getItems().size();
                     } else {
                         dropIndex = row.getIndex();
                     }
 
-                    installableTable.getItems().add(dropIndex, draggedInstallable);
+                    archiveTable.getItems().add(dropIndex, draggedArchive);
 
                     event.setDropCompleted(true);
-                    installableTable.getSelectionModel().select(dropIndex);
+                    archiveTable.getSelectionModel().select(dropIndex);
                     event.consume();
                 } else {
                     LOGGER.debug("Dragboard content is not of the required type");
@@ -177,32 +174,32 @@ public class MainAppController {
 
             row.setOnMouseClicked(e -> {
                 if (row.isEmpty()) {
-                    installableTable.getSelectionModel().clearSelection();
+                    archiveTable.getSelectionModel().clearSelection();
                 }
             });
             return row;
         });
 
-        nameColumn.setCellValueFactory(
+        archiveNameColumn.setCellValueFactory(
                 cellData -> cellData.getValue().nameProperty());
 
-        installableTable.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> onInstallableSelection(oldValue, newValue));
+        archiveTable.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> onArchiveSelection(oldValue, newValue));
 
 
-        installableTable.setOnDragOver(event -> {
-            if (event.getGestureSource() != installableTable &&
+        archiveTable.setOnDragOver(event -> {
+            if (event.getGestureSource() != archiveTable &&
                     event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
         });
 
-        installableTable.setOnDragEntered(Event::consume);
+        archiveTable.setOnDragEntered(Event::consume);
 
-        installableTable.setOnDragExited(Event::consume);
+        archiveTable.setOnDragExited(Event::consume);
 
-        installableTable.setOnDragDropped(event -> {
+        archiveTable.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             LOGGER.debug("onDragDropped. Transfer modes are " + db.getTransferModes());
             boolean success = false;
@@ -231,10 +228,10 @@ public class MainAppController {
             }
         });
 
-        addInstallableButton.setOnAction(c -> {
+        addArchiveButton.setOnAction(c -> {
             DirectoryAwareFileChooser chooser = applicationContext.getFileChooser();
             chooser.setTitle(LocaleUtil.i18n("openSnapshot"));
-            final List<File> snapshotFiles = chooser.showOpenMultipleDialog(addInstallableButton.getScene().getWindow());
+            final List<File> snapshotFiles = chooser.showOpenMultipleDialog(addArchiveButton.getScene().getWindow());
             if (snapshotFiles != null) {
                 try {
                     addInstallablesFromFiles(snapshotFiles);
@@ -244,13 +241,13 @@ public class MainAppController {
             }
         });
 
-        removeSelectedInstallableButton.setOnAction(c -> {
-            Optional<Installable> selectedInstallable = Optional.of(installableTable.getSelectionModel().getSelectedItem());
+        removeSelectedArchiveButton.setOnAction(c -> {
+            Optional<Archive> selectedInstallable = Optional.of(archiveTable.getSelectionModel().getSelectedItem());
             selectedInstallable.ifPresent(index -> applicationContext.getRomSetHandler()
-                    .removeInstallable(selectedInstallable.get()));
+                    .removeArchive(selectedInstallable.get()));
         });
 
-        clearRomsetButton.setOnAction(c -> {
+        purgeArchivesButton.setOnAction(c -> {
             Optional<ButtonType> result = DialogUtil
                     .buildAlert(LocaleUtil.i18n("gameDeletionConfirmTitle"),
                             LocaleUtil.i18n("gameDeletionConfirmHeader"),
@@ -258,17 +255,17 @@ public class MainAppController {
                     .showAndWait();
 
             if (result.orElse(ButtonType.CANCEL) == ButtonType.OK){
-                applicationContext.getInstallableList().clear();
+                applicationContext.getArchiveList().clear();
             }
         });
     }
 
-    private void onInstallableSelection(Installable oldInstallable, Installable newInstallable) {
-        LOGGER.debug("onGameSelection oldGame=" + oldInstallable + ", newGame=" + newInstallable);
-        if (newInstallable == null) {
-            removeSelectedInstallableButton.setDisable(true);
+    private void onArchiveSelection(Archive oldArchive, Archive newArchive) {
+        LOGGER.debug("onGameSelection oldGame=" + oldArchive + ", newGame=" + newArchive);
+        if (newArchive == null) {
+            removeSelectedArchiveButton.setDisable(true);
         } else {
-            removeSelectedInstallableButton.setDisable(false);
+            removeSelectedArchiveButton.setDisable(false);
         }
     }
 

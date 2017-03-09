@@ -8,20 +8,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="325.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grelobites.romgenerator.view.PreferencesController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="325.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grelobites.dandanator.cpm.view.PreferencesController">
    <children>
-      <ImageView fx:id="backgroundImageView" fitHeight="192.0" fitWidth="256.0" layoutX="63.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="bootImageView" fitHeight="192.0" fitWidth="256.0" layoutX="63.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true" />
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="220.0" prefHeight="23.0" prefWidth="379.0" spacing="10.0">
          <children>
             <Label maxWidth="1.7976931348623157E308" text="%bootImageMessage" HBox.hgrow="ALWAYS">
                <font>
                   <Font size="12.0" />
                </font></Label>
-            <Button fx:id="changeBackgroundImageButton" mnemonicParsing="false" text="%changeButton">
+            <Button fx:id="changeBootImageButton" mnemonicParsing="false" text="%changeButton">
                <font>
                   <Font size="12.0" />
                </font></Button>
-            <Button fx:id="resetBackgroundImageButton" mnemonicParsing="false" text="%resetButton">
+            <Button fx:id="resetBootImageButton" mnemonicParsing="false" text="%resetButton">
                <font>
                   <Font size="12.0" />
                </font></Button>
@@ -37,12 +37,12 @@
                   <Font size="12.0" />
                </font>
             </Label>
-            <Button fx:id="changeCharSetButton" alignment="CENTER" mnemonicParsing="false" text="%changeButton">
+            <Button fx:id="changeEmsPathButton" alignment="CENTER" mnemonicParsing="false" text="%changeButton">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="resetCharSetButton" mnemonicParsing="false" text="%resetButton">
+            <Button fx:id="resetEmsPathButton" mnemonicParsing="false" text="%resetButton">
                <font>
                   <Font size="12.0" />
                </font>

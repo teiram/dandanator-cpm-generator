@@ -19,8 +19,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class MainApp extends Application {
 	private Stage primaryStage;
     private Stage preferencesStage;
     private Stage aboutStage;
-    private TabPane preferencesPane;
+    private Pane preferencesPane;
     private TabPane aboutPane;
     private MenuToolkit menuToolkit;
     private ApplicationContext applicationContext;
@@ -64,12 +64,12 @@ public class MainApp extends Application {
 
 
     private MenuItem exportInstallableMenuItem(ApplicationContext applicationContext) {
-        MenuItem exportGame = new MenuItem(LocaleUtil.i18n("exportInstallableMenuEntry"));
+        MenuItem exportGame = new MenuItem(LocaleUtil.i18n("exportArchiveMenuEntry"));
         exportGame.setAccelerator(
                 KeyCombination.keyCombination("SHORTCUT+G")
         );
         exportGame.disableProperty().bind(applicationContext
-                .installableSelectedProperty().not());
+                .archiveSelectedProperty().not());
 
         exportGame.setOnAction(f -> {
             try {
@@ -140,7 +140,7 @@ public class MainApp extends Application {
 
 	}
 
-    private TabPane getPreferencesPane() throws IOException {
+    private Pane getPreferencesPane() throws IOException {
         if (preferencesPane == null) {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("view/preferences.fxml"));
@@ -253,10 +253,11 @@ public class MainApp extends Application {
         return menuBar;
     }
 
-    private AnchorPane getApplicationPane() throws IOException {
+    private Pane getApplicationPane() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("view/mainapp.fxml"));
         loader.setResources(LocaleUtil.getBundle());
+
         loader.setController(new MainAppController(applicationContext));
         return loader.load();
     }
@@ -279,6 +280,7 @@ public class MainApp extends Application {
             }
             populateMenuBar(menuBar, scene, applicationContext);
             mainPane.setCenter(getApplicationPane());
+            mainPane.getStylesheets().add(Constants.getThemeResourceUrl());
 
             primaryStage.setScene(scene);
             applicationContext.setApplicationStage(primaryStage);
