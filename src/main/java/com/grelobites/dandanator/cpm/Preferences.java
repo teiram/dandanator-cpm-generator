@@ -11,17 +11,17 @@ public class Preferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     byte[] bootImage;
-    byte[] emsImage;
+    byte[] emsBinary;
 
 
     private StringProperty bootImagePath;
-    private StringProperty emsImagePath;
+    private StringProperty emsBinaryPath;
 
     private static Preferences INSTANCE;
 
     private Preferences() {
         this.bootImagePath = new SimpleStringProperty();
-        this.emsImagePath = new SimpleStringProperty();
+        this.emsBinaryPath = new SimpleStringProperty();
     }
 
     public static Preferences getInstance() {
@@ -46,12 +46,15 @@ public class Preferences {
         this.bootImage = bootImage;
     }
 
-    public byte[] getEmsImage() {
-        return emsImage;
+    public byte[] getEmsBinary() throws IOException {
+        if (emsBinary == null) {
+            emsBinary = Constants.getDefaultEmsBinary();
+        }
+        return emsBinary;
     }
 
-    public void setEmsImage(byte[] emsImage) {
-        this.emsImage = emsImage;
+    public void setEmsBinary(byte[] emsBinary) {
+        this.emsBinary = emsBinary;
     }
 
     public String getBootImagePath() {
@@ -66,16 +69,16 @@ public class Preferences {
         this.bootImagePath.set(bootImagePath);
     }
 
-    public String getEmsImagePath() {
-        return emsImagePath.get();
+    public String getEmsBinaryPath() {
+        return emsBinaryPath.get();
     }
 
-    public StringProperty emsImagePathProperty() {
-        return emsImagePath;
+    public StringProperty emsBinaryPathProperty() {
+        return emsBinaryPath;
     }
 
-    public void setEmsImagePath(String emsImagePath) {
-        this.emsImagePath.set(emsImagePath);
+    public void setEmsBinaryPath(String emsBinaryPath) {
+        this.emsBinaryPath.set(emsBinaryPath);
     }
 
 }

@@ -33,10 +33,10 @@ public class PreferencesController {
     private Button resetBootImageButton;
 
     @FXML
-    private Button changeEmsPathButton;
+    private Button changeEmsBinaryPathButton;
 
     @FXML
-    private Button resetEmsPathButton;
+    private Button resetEmsBinaryPathButton;
 
 
     private void initializeImages() throws IOException {
@@ -61,9 +61,9 @@ public class PreferencesController {
         }
     }
 
-    private void updateEmsPath(File emsFile) throws IOException {
+    private void updateEmsBinaryPath(File emsFile) throws IOException {
         if (isReadableFile(emsFile) && emsFile.length() <= Constants.MAX_EMS_FILE_SIZE) {
-            Preferences.getInstance().setEmsImagePath(emsFile.getAbsolutePath());
+            Preferences.getInstance().setEmsBinaryPath(emsFile.getAbsolutePath());
         } else {
             throw new IllegalArgumentException("No valid EMS file provided");
         }
@@ -115,24 +115,24 @@ public class PreferencesController {
                 });
     }
 
-    private void emsSetup() {
+    private void emsBinarySetup() {
         Preferences configuration = Preferences.getInstance();
-        changeEmsPathButton.setOnAction(event -> {
+        changeEmsBinaryPathButton.setOnAction(event -> {
             FileChooser chooser = new FileChooser();
             chooser.setTitle(LocaleUtil.i18n("selectNewEmsMessage"));
-            final File emsFile = chooser.showOpenDialog(changeEmsPathButton.getScene().getWindow());
+            final File emsFile = chooser.showOpenDialog(changeEmsBinaryPathButton.getScene().getWindow());
             if (emsFile != null) {
                 try {
-                    updateEmsPath(emsFile);
+                    updateEmsBinaryPath(emsFile);
                 } catch (Exception e) {
                     LOGGER.error("Updating EMS from " + emsFile, e);
                     showGenericFileErrorAlert();
                 }
             }
         });
-        resetEmsPathButton.setOnAction(event -> {
+        resetEmsBinaryPathButton.setOnAction(event -> {
             try {
-                configuration.setEmsImagePath(null);
+                configuration.setEmsBinaryPath(null);
             } catch (Exception e) {
                 LOGGER.error("Resetting EMS Path", e);
             }
@@ -145,7 +145,7 @@ public class PreferencesController {
 
         backgroundImageSetup();
 
-        emsSetup();
+        emsBinarySetup();
 
     }
 }

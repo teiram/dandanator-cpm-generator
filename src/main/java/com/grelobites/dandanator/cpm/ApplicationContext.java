@@ -1,9 +1,12 @@
 package com.grelobites.dandanator.cpm;
 
+import com.grelobites.dandanator.cpm.handlers.SimpleRomSetHandler;
 import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
+import com.grelobites.dandanator.cpm.util.ArchiveUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.OperationResult;
+import com.grelobites.dandanator.cpm.view.UserAreaPicker;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
 import com.grelobites.dandanator.cpm.view.util.DirectoryAwareFileChooser;
 import javafx.application.Platform;
@@ -45,6 +48,7 @@ public class ApplicationContext {
     private DirectoryAwareFileChooser fileChooser;
 
     private RomSetHandler romSetHandler;
+    private UserAreaPicker userFilter;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(5, r -> {
         Thread t = new Thread(r);
@@ -54,6 +58,7 @@ public class ApplicationContext {
     });
 
     public ApplicationContext() {
+        this.romSetHandler = new SimpleRomSetHandler(this);
         this.archiveList = FXCollections.observableArrayList(Archive::getObservables);
         this.archiveSelected = new SimpleBooleanProperty(false);
         this.romUsage = new SimpleDoubleProperty();
@@ -142,7 +147,19 @@ public class ApplicationContext {
         this.applicationStage = applicationStage;
     }
 
-    public void exportCurrentInstallable() {
+    public UserAreaPicker getUserFilter() {
+        return userFilter;
+    }
+
+    public void setUserFilter(UserAreaPicker userFilter) {
+        this.userFilter = userFilter;
+    }
+
+    public int getCurrentUserArea() {
+        return userFilter.isDisable() ? 0 : userFilter.getUserArea();
+    }
+
+    public void exportCurrentArchive() {
         Archive archive = selectedArchive.get();
         if (archive != null) {
             DirectoryAwareFileChooser chooser = getFileChooser();
@@ -151,7 +168,7 @@ public class ApplicationContext {
             final File saveFile = chooser.showSaveDialog(applicationStage.getScene().getWindow());
             if (saveFile != null) {
                 try {
-                    archive.exportAsFile(saveFile);
+                    ArchiveUtil.exportAsFile(archive, saveFile);
                 } catch (IOException e) {
                     LOGGER.error("Exporting Installable", e);
                 }

@@ -4,12 +4,14 @@ import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
 import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
+import com.grelobites.dandanator.cpm.util.ArchiveUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.OperationResult;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
 import com.grelobites.dandanator.cpm.view.util.DirectoryAwareFileChooser;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -35,13 +37,18 @@ public class MainAppController {
     private ApplicationContext applicationContext;
 
     @FXML
-    private Pane applicationPane;
+    private Pane archiveInformationPane;
 
     @FXML
     private TableView<Archive> archiveTable;
 
+    private FilteredList<Archive> filteredArchiveList;
+
     @FXML
     private TableColumn<Archive, String> archiveNameColumn;
+
+    @FXML
+    private TableColumn<Archive, Number> archiveSizeColumn;
 
     @FXML
     private Button createRomButton;
@@ -59,7 +66,46 @@ public class MainAppController {
     private ProgressIndicator operationInProgressIndicator;
 
     @FXML
-    private Pane romSetHandlerInfoPane;
+    private CheckBox userFilterEnable;
+
+    @FXML
+    private Button userFilterDecrementButton;
+
+    @FXML
+    private Label userFilterValue;
+
+    @FXML
+    private Button userFilterIncrementButton;
+
+    @FXML
+    private TextField archiveName;
+
+    @FXML
+    private TextField archiveExtension;
+
+    @FXML
+    private Label archiveSize;
+
+    @FXML
+    private Button archiveUserAreaDecrementButton;
+
+    @FXML
+    private Button archiveUserAreaIncrementButton;
+
+    @FXML
+    private Label archiveUserArea;
+
+    @FXML
+    private CheckBox archiveReadOnlyAttribute;
+
+    @FXML
+    private CheckBox archiveSystemFileAttribute;
+
+    @FXML
+    private CheckBox archiveArchivedAttribute;
+
+    private UserAreaPicker filterUserAreaPicker;
+    private ArchiveView archiveView;
 
     public MainAppController(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -78,47 +124,63 @@ public class MainAppController {
         return file.getName();
     }
 
-    private void addInstallablesFromFiles(List<File> files) {
-        files.forEach(file ->
-            applicationContext.addBackgroundTask(() -> {
-                Optional<Archive> archiveOptional = Archive.fromFile(getArchiveName(file), file);
-                if (archiveOptional.isPresent()) {
-                    Platform.runLater(() -> getRomSetHandler().addArchive(archiveOptional.get()));
-                } else {
-                    Platform.runLater(() -> {
-                        try (FileInputStream fis = new FileInputStream(file)) {
-                            if (getApplicationContext().getArchiveList().isEmpty()) {
-                                getRomSetHandler().importRomSet(fis);
-                            } else {
-                                getRomSetHandler().mergeRomSet(fis);
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error("Importing ROMSet", e);
-                            DialogUtil.buildErrorAlert(
-                                    LocaleUtil.i18n("fileImportError"),
-                                    LocaleUtil.i18n("fileImportErrorHeader"),
-                                    LocaleUtil.i18n("fileImportErrorContent"))
-                                    .showAndWait();
-                        }
-                    });
+    private void addArchivesFromFiles(List<File> files) {
+        files.forEach(file -> {
+            try {
+                List<Archive> archives = ArchiveUtil.getArchivesInFile(applicationContext, file);
+                LOGGER.debug("Returned list of archives " + archives);
+                for (Archive archive : archives) {
+                    getRomSetHandler().addArchive(archive);
                 }
-                return OperationResult.successResult();
-            }));
+            } catch (Exception e) {
+                LOGGER.error("In addArchivesFromFiles", e);
+
+            }
+        });
     }
 
     @FXML
     private void initialize() throws IOException {
         applicationContext.setSelectedArchiveProperty(archiveTable.getSelectionModel().selectedItemProperty());
 
-       purgeArchivesButton.disableProperty()
+        purgeArchivesButton.disableProperty()
                 .bind(Bindings.size(applicationContext.getArchiveList())
                         .isEqualTo(0));
 
-        archiveTable.setItems(applicationContext.getArchiveList());
+        filteredArchiveList = new FilteredList<>(applicationContext.getArchiveList());
+        archiveTable.setItems(filteredArchiveList);
         archiveTable.setPlaceholder(new Label(LocaleUtil.i18n("dropArchivesMessage")));
+
+        filterUserAreaPicker = new UserAreaPicker(userFilterDecrementButton,
+                userFilterIncrementButton,
+                userFilterValue);
+        applicationContext.setUserFilter(filterUserAreaPicker);
+
+        filterUserAreaPicker.disableProperty().bind(userFilterEnable.selectedProperty().not());
+
+        userFilterEnable.setSelected(false);
+        userFilterEnable.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                filteredArchiveList.setPredicate(f -> f.getUserArea() == filterUserAreaPicker.getUserArea());
+            } else {
+                filteredArchiveList.setPredicate(f -> true);
+            }
+        });
+
+        filterUserAreaPicker.userAreaProperty().addListener((observable, oldvalue, newValue) -> {
+            if (userFilterEnable.isSelected()) {
+                filteredArchiveList.setPredicate(f -> f.getUserArea() == filterUserAreaPicker.getUserArea());
+            }
+        });
 
         operationInProgressIndicator.visibleProperty().bind(
                 applicationContext.backgroundTaskCountProperty().greaterThan(0));
+
+        archiveView = new ArchiveView(applicationContext, archiveName, archiveExtension, archiveSize,
+                new UserAreaPicker(archiveUserAreaDecrementButton,
+                        archiveUserAreaIncrementButton,
+                        archiveUserArea),
+                archiveReadOnlyAttribute, archiveSystemFileAttribute, archiveArchivedAttribute);
 
         onArchiveSelection(null, null);
 
@@ -181,7 +243,12 @@ public class MainAppController {
         });
 
         archiveNameColumn.setCellValueFactory(
-                cellData -> cellData.getValue().nameProperty());
+                cellData -> cellData.getValue().nameProperty()
+                        .concat(Constants.FILE_EXTENSION_SEPARATOR)
+                        .concat(cellData.getValue().extensionProperty()));
+
+        archiveSizeColumn.setCellValueFactory(
+                cellData -> cellData.getValue().sizeProperty());
 
         archiveTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> onArchiveSelection(oldValue, newValue));
@@ -204,7 +271,7 @@ public class MainAppController {
             LOGGER.debug("onDragDropped. Transfer modes are " + db.getTransferModes());
             boolean success = false;
             if (db.hasFiles()) {
-                addInstallablesFromFiles(db.getFiles());
+                addArchivesFromFiles(db.getFiles());
                 success = true;
             }
             /* let the source know whether the files were successfully
@@ -230,11 +297,11 @@ public class MainAppController {
 
         addArchiveButton.setOnAction(c -> {
             DirectoryAwareFileChooser chooser = applicationContext.getFileChooser();
-            chooser.setTitle(LocaleUtil.i18n("openSnapshot"));
+            chooser.setTitle(LocaleUtil.i18n("addArchiveDialog"));
             final List<File> snapshotFiles = chooser.showOpenMultipleDialog(addArchiveButton.getScene().getWindow());
             if (snapshotFiles != null) {
                 try {
-                    addInstallablesFromFiles(snapshotFiles);
+                    addArchivesFromFiles(snapshotFiles);
                 } catch (Exception e) {
                     LOGGER.error("Opening snapshots from files " + snapshotFiles, e);
                 }
@@ -249,9 +316,9 @@ public class MainAppController {
 
         purgeArchivesButton.setOnAction(c -> {
             Optional<ButtonType> result = DialogUtil
-                    .buildAlert(LocaleUtil.i18n("gameDeletionConfirmTitle"),
-                            LocaleUtil.i18n("gameDeletionConfirmHeader"),
-                            LocaleUtil.i18n("gameDeletionConfirmContent"))
+                    .buildAlert(LocaleUtil.i18n("archiveDeletionConfirmTitle"),
+                            LocaleUtil.i18n("archiveDeletionConfirmHeader"),
+                            LocaleUtil.i18n("archiveDeletionConfirmContent"))
                     .showAndWait();
 
             if (result.orElse(ButtonType.CANCEL) == ButtonType.OK){
@@ -261,7 +328,9 @@ public class MainAppController {
     }
 
     private void onArchiveSelection(Archive oldArchive, Archive newArchive) {
-        LOGGER.debug("onGameSelection oldGame=" + oldArchive + ", newGame=" + newArchive);
+        LOGGER.debug("onArchiveSelection oldArchive=" + oldArchive + ", newArchive=" + newArchive);
+        archiveView.bindToArchive(newArchive);
+        archiveInformationPane.setDisable(newArchive == null);
         if (newArchive == null) {
             removeSelectedArchiveButton.setDisable(true);
         } else {

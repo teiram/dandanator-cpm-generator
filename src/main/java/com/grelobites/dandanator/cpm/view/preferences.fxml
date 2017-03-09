@@ -37,12 +37,12 @@
                   <Font size="12.0" />
                </font>
             </Label>
-            <Button fx:id="changeEmsPathButton" alignment="CENTER" mnemonicParsing="false" text="%changeButton">
+            <Button fx:id="changeEmsBinaryPathButton" alignment="CENTER" mnemonicParsing="false" text="%changeButton">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="resetEmsPathButton" mnemonicParsing="false" text="%resetButton">
+            <Button fx:id="resetEmsBinaryPathButton" mnemonicParsing="false" text="%resetButton">
                <font>
                   <Font size="12.0" />
                </font>

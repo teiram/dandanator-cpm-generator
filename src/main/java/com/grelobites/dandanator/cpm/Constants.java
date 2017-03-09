@@ -14,10 +14,21 @@ public class Constants {
 	public static final int SPECTRUM_COLORINFO_SIZE = 768;
 	public static final int SPECTRUM_FULLSCREEN_SIZE = SPECTRUM_SCREEN_SIZE +
 			SPECTRUM_COLORINFO_SIZE;
+	public static final int CPM_FILENAME_MAXLENGTH = 8;
+	public static final int CPM_DEFAULT_USER_AREA = 0;
+	public static final int CPM_FILEEXTENSION_MAXLENGTH = 3;
+	public static final String FILE_EXTENSION_SEPARATOR = ".";
+	public static final String EMPTY_STRING = "";
+	public static final String NO_VALUE = "-";
+	public static final String TEXT_ERROR_STYLE = "red-text";
+
     private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
+    private static final String DEFAULT_EMS_BINARY_RESOURCE = "S10CPM3.EMS";
     private static final String THEME_RESOURCE = "view/theme.css";
 
+
     private static byte[] DEFAULT_BOOT_IMAGE;
+    private static byte[] DEFAULT_EMS_BINARY;
 
     private static String THEME_RESOURCE_URL;
 
@@ -39,6 +50,16 @@ public class Constants {
         }
         return DEFAULT_BOOT_IMAGE;
     }
+
+    public static byte[] getDefaultEmsBinary() throws IOException {
+        if (DEFAULT_EMS_BINARY == null) {
+            DEFAULT_EMS_BINARY = Util.fromInputStream(
+                    Constants.class.getClassLoader()
+                            .getResourceAsStream(DEFAULT_EMS_BINARY_RESOURCE));
+        }
+        return DEFAULT_EMS_BINARY;
+    }
+
 
     public static String getThemeResourceUrl() {
         if (THEME_RESOURCE_URL == null) {

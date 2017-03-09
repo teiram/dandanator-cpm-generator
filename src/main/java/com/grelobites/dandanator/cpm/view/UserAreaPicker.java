@@ -1,9 +1,11 @@
 package com.grelobites.dandanator.cpm.view;
 
+import com.grelobites.dandanator.cpm.Constants;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
@@ -19,7 +21,7 @@ public class UserAreaPicker {
     private final Label userAreaLabel;
 
     public UserAreaPicker(Button decreaseButton, Button increaseButton, Label userAreaLabel) {
-        this.userArea = new SimpleIntegerProperty(0);
+        this.userArea = new SimpleIntegerProperty(Constants.CPM_DEFAULT_USER_AREA);
         this.disable = new SimpleBooleanProperty(false);
 
         this.decreaseButton = decreaseButton;
@@ -37,7 +39,7 @@ public class UserAreaPicker {
         });
         this.decreaseButton.setOnAction(e -> {
             if (userArea.get() > MIN_USER_AREA) {
-                userArea.set(userArea.get() + 1);
+                userArea.set(userArea.get() - 1);
             }
         });
         this.userArea.addListener((observable, oldValue, newValue) -> {
@@ -67,5 +69,9 @@ public class UserAreaPicker {
 
     public void setUserArea(int userArea) {
         this.userArea.set(userArea);
+    }
+
+    public ObservableList<String> getStyleClass() {
+        return userAreaLabel.getStyleClass();
     }
 }

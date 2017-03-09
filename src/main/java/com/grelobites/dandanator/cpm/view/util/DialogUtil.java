@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 
 public class DialogUtil {
 
-    private static final String CSS_LOCATION = "/com/grelobites/romgenerator/view/theme.css";
+    private static final String CSS_LOCATION = "/com/grelobites/dandanator/cpm/view/theme.css";
 
     private static void applyTheme(Alert alert) {
         alert.getDialogPane().getStylesheets().add(DialogUtil.class.getResource(CSS_LOCATION).toExternalForm());

@@ -73,7 +73,7 @@ public class MainApp extends Application {
 
         exportGame.setOnAction(f -> {
             try {
-                applicationContext.exportCurrentInstallable();
+                applicationContext.exportCurrentArchive();
             } catch (Exception e) {
                 LOGGER.error("Exporting current installable", e);
             }
