@@ -104,6 +104,12 @@ public class MainAppController {
     @FXML
     private CheckBox archiveArchivedAttribute;
 
+    @FXML
+    private ProgressBar directoryResources;
+
+    @FXML
+    private ProgressBar diskResources;
+
     private UserAreaPicker filterUserAreaPicker;
     private ArchiveView archiveView;
 
@@ -280,7 +286,7 @@ public class MainAppController {
             event.consume();
         });
 
-
+        createRomButton.setDisable(false);
         createRomButton.setOnAction(c -> {
             DirectoryAwareFileChooser chooser = applicationContext.getFileChooser();
             chooser.setTitle(LocaleUtil.i18n("saveRomSet"));
@@ -325,6 +331,16 @@ public class MainAppController {
                 applicationContext.getArchiveList().clear();
             }
         });
+
+        directoryResources.progressProperty().bind(applicationContext.directoryUsageProperty());
+        Tooltip directoryResourcesDetail = new Tooltip();
+        directoryResources.setTooltip(directoryResourcesDetail);
+        directoryResourcesDetail.textProperty().bind(applicationContext.directoryUsageDetailProperty());
+
+        diskResources.progressProperty().bind(applicationContext.romUsageProperty());
+        Tooltip diskResourcesDetail = new Tooltip();
+        diskResources.setTooltip(diskResourcesDetail);
+        diskResourcesDetail.textProperty().bind(applicationContext.romUsageDetailProperty());
     }
 
     private void onArchiveSelection(Archive oldArchive, Archive newArchive) {

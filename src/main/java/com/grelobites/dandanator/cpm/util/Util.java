@@ -1,5 +1,6 @@
 package com.grelobites.dandanator.cpm.util;
 
+import com.grelobites.dandanator.cpm.model.Archive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,11 +139,17 @@ public class Util {
         return result;
     }
 
-    public static byte[] paddedByteArray(byte[] source, int length, byte filler) {
+    public static byte[] paddedByteArray(byte[] source, int from, int length, byte filler) {
+        LOGGER.debug("paddedByteArray from array of length " + source.length + " from " + from
+            + ", length = " + length);
         byte[] result = new byte[length];
         Arrays.fill(result, filler);
-        System.arraycopy(source, 0, result, 0, source.length);
+        System.arraycopy(source, from, result, 0, Math.min(source.length - from, length));
         return result;
+    }
+
+    public static byte[] paddedByteArray(byte[] source, int length, byte filler) {
+        return paddedByteArray(source, 0, length, filler);
     }
 
     public static <S, T> Collection<T> collectionUpcast(Collection<S> list) {
@@ -176,6 +183,12 @@ public class Util {
         return sum & 0xffff;
     }
 
+    public static int roundToNearestMultiple(int value, int multiple) {
+        if ((multiple & (multiple - 1)) != 0) {
+            throw new IllegalArgumentException("Non power of 2 multiple argument");
+        }
+        return (value + multiple - 1) & ~(multiple - 1);
+    }
 
 
 }

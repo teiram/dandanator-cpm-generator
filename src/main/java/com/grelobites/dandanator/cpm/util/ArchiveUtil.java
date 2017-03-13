@@ -2,6 +2,7 @@ package com.grelobites.dandanator.cpm.util;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
+import com.grelobites.dandanator.cpm.filesystem.CpmFileSystem;
 import com.grelobites.dandanator.cpm.model.Archive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,15 @@ public class ArchiveUtil {
 
     public static FileType guessFileType(File file) {
         //TODO: Implement properly for DSK and ROMSET detection
-        return FileType.ARCHIVE;
+        if (file.getName().endsWith(".raw")) {
+            return FileType.RAWFS;
+        } else if (file.getName().endsWith(".dsk")) {
+            return FileType.DSK;
+        } else if (file.getName().endsWith(".rom") && file.length() == 16386 * 32) {
+            return FileType.ROMSET;
+        } else {
+            return FileType.ARCHIVE;
+        }
     }
 
     public static Archive createArchiveFromFile(File file, ApplicationContext context) throws IOException {
@@ -87,6 +96,10 @@ public class ArchiveUtil {
             case ARCHIVE:
                 Archive archive = createArchiveFromFile(file, context);
                 return Collections.singletonList(archive);
+            case RAWFS:
+                CpmFileSystem fs = CpmFileSystem.fromByteArray(Files.readAllBytes(file.toPath()),
+                        Constants.PLUS3_FS_PARAMETERS);
+                return fs.getArchiveList();
             default:
                 throw new IllegalArgumentException("Not implemented yet");
         }

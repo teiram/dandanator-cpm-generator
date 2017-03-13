@@ -97,13 +97,13 @@
                            </VBox.margin>
                            <children>
                               <Label maxWidth="1.7976931348623157E308" text="%directoryResources" HBox.hgrow="ALWAYS" />
-                              <ProgressBar fx:id="directoryResources" progress="0.35" />
+                              <ProgressBar fx:id="directoryResources" progress="0.0" />
                            </children>
                         </HBox>
                         <HBox>
                            <children>
                               <Label maxWidth="1.7976931348623157E308" text="%diskResources" HBox.hgrow="ALWAYS" />
-                              <ProgressBar fx:id="diskResources" progress="0.35" />
+                              <ProgressBar fx:id="diskResources" progress="0.0" />
                            </children>
                            <VBox.margin>
                               <Insets left="5.0" right="5.0" />

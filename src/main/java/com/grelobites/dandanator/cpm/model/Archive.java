@@ -106,7 +106,8 @@ public class Archive {
     @Override
     public String toString() {
         return "Archive{" +
-                "name=" + name +
+                "id=" + id +
+                ", name=" + name +
                 ", extension=" + extension +
                 ", userArea=" + userArea +
                 ", flags=" + flags +

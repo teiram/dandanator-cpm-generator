@@ -1,0 +1,117 @@
+package com.grelobites.dandanator.cpm.dsk;
+
+import com.grelobites.dandanator.cpm.Constants;
+import com.grelobites.dandanator.cpm.filesystem.CpmConstants;
+import com.grelobites.dandanator.cpm.model.FileSystemParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+public class DskUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DskUtil.class);
+
+    private static class DiskSpec {
+        private final int formatId;
+        private final int sides;
+        private final int tracksBySide;
+        private final int sectorsByTrack;
+        private final int physicalSectorShift;
+        private final int reservedTracks;
+        private final int blockShift;
+        private final int directoryBlocks;
+
+        public static DiskSpec fromData(byte[] data) {
+            return new DiskSpec(data);
+        }
+
+        private DiskSpec(byte[] data) {
+            ByteBuffer buffer = ByteBuffer.wrap(data);
+            formatId = buffer.get();
+            sides = buffer.get();
+            tracksBySide = buffer.get();
+            sectorsByTrack = buffer.get();
+            physicalSectorShift = buffer.get();
+            reservedTracks = buffer.get();
+            blockShift = buffer.get();
+            directoryBlocks = buffer.get();
+        }
+
+        public int getFormatId() {
+            return formatId;
+        }
+
+        public int getSides() {
+            return sides;
+        }
+
+        public int getTracksBySide() {
+            return tracksBySide;
+        }
+
+        public int getSectorsByTrack() {
+            return sectorsByTrack;
+        }
+
+        public int getPhysicalSectorShift() {
+            return physicalSectorShift;
+        }
+
+        public int getReservedTracks() {
+            return reservedTracks;
+        }
+
+        public int getBlockShift() {
+            return blockShift;
+        }
+
+        public int getDirectoryBlocks() {
+            return directoryBlocks;
+        }
+
+        @Override
+        public String toString() {
+            return "DiskSpec{" +
+                    "formatId=" + formatId +
+                    ", sides=" + sides +
+                    ", tracksBySide=" + tracksBySide +
+                    ", sectorsByTrack=" + sectorsByTrack +
+                    ", physicalSectorShift=" + physicalSectorShift +
+                    ", reservedTracks=" + reservedTracks +
+                    ", blockShift=" + blockShift +
+                    ", directoryBlocks=" + directoryBlocks +
+                    '}';
+        }
+    }
+
+    public static FileSystemParameters guessFileSystemParameters(DskContainer dsk) {
+        int sectorId = dsk.getTrack(0)
+                .getInformation().getSectorInformation(0).getSectorId();
+        if (sectorId == 0x41) {
+            return Constants.CPC_SYSTEM_FS_PARAMETERS;
+        } else if (sectorId == 0xC1) {
+            return Constants.CPC_DATA_FS_PARAMETERS;
+        }
+
+        //Check the spec now
+        byte [] specData = Arrays.copyOf(dsk.getTrack(0).getSectorData(1), 16);
+        if (specData[0] == CpmConstants.EMPTY_BYTE) {
+            return Constants.PLUS3_FS_PARAMETERS;
+        } else {
+            DiskSpec spec = DiskSpec.fromData(specData);
+            LOGGER.debug("Using Disk spec to guess format " + spec);
+            int blockSize = 128 << spec.getBlockShift();
+            int blockShift = spec.getBlockShift() - spec.getPhysicalSectorShift();
+            return FileSystemParameters.newBuilder()
+                    .withBlockCount(spec.getSides() * spec.getTracksBySide() * spec.getSectorsByTrack())
+                    .withBlockSize(blockSize)
+                    .withReservedTracks(spec.getReservedTracks())
+                    .withDirectoryEntries((spec.getDirectoryBlocks() * blockSize) / CpmConstants.DIRECTORY_ENTRY_SIZE)
+                    .withSectorSize(128 << spec.getPhysicalSectorShift())
+                    .withSectorsByTrack(spec.getSectorsByTrack())
+                    .withTrackCount(spec.getTracksBySide() * spec.getSides())
+                    .build();
+        }
+    }
+}

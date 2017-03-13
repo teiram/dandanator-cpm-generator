@@ -1,5 +1,6 @@
 package com.grelobites.dandanator.cpm;
 
+import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import com.grelobites.dandanator.cpm.util.Util;
 
 import java.io.IOException;
@@ -21,6 +22,50 @@ public class Constants {
 	public static final String EMPTY_STRING = "";
 	public static final String NO_VALUE = "-";
 	public static final String TEXT_ERROR_STYLE = "red-text";
+
+    public static final FileSystemParameters ROMSET_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(224)
+                    .withBlockSize(2048)
+                    .withDirectoryEntries(128)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(80)
+                    .withSectorSize(512)
+                    .build();
+
+    public static final FileSystemParameters PLUS3_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(175)
+                    .withBlockSize(1024)
+                    .withDirectoryEntries(64)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(40)
+                    .withSectorSize(512)
+                    .withReservedTracks(1)
+                    .build();
+
+    public static final FileSystemParameters CPC_SYSTEM_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(180)
+                    .withBlockSize(1024)
+                    .withDirectoryEntries(64)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(40)
+                    .withSectorSize(512)
+                    .withReservedTracks(2)
+                    .build();
+
+    public static final FileSystemParameters CPC_DATA_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(180)
+                    .withBlockSize(1024)
+                    .withDirectoryEntries(64)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(40)
+                    .withSectorSize(512)
+                    .withReservedTracks(0)
+                    .build();
+
 
     private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
     private static final String DEFAULT_EMS_BINARY_RESOURCE = "S10CPM3.EMS";

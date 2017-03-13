@@ -44,6 +44,8 @@ public class ApplicationContext {
     private BooleanProperty archiveSelected;
     private StringProperty romUsageDetail;
     private DoubleProperty romUsage;
+    private StringProperty directoryUsageDetail;
+    private DoubleProperty directoryUsage;
     private IntegerProperty backgroundTaskCount;
     private DirectoryAwareFileChooser fileChooser;
 
@@ -58,12 +60,15 @@ public class ApplicationContext {
     });
 
     public ApplicationContext() {
-        this.romSetHandler = new SimpleRomSetHandler(this);
         this.archiveList = FXCollections.observableArrayList(Archive::getObservables);
+        this.romSetHandler = new SimpleRomSetHandler(this);
         this.archiveSelected = new SimpleBooleanProperty(false);
-        this.romUsage = new SimpleDoubleProperty();
+        this.romUsage = new SimpleDoubleProperty(0);
         this.romUsageDetail = new SimpleStringProperty();
         this.backgroundTaskCount = new SimpleIntegerProperty();
+        this.directoryUsage = new SimpleDoubleProperty(0);
+        this.directoryUsageDetail = new SimpleStringProperty();
+
     }
 
     public ObservableList<Archive> getArchiveList() {
@@ -111,6 +116,30 @@ public class ApplicationContext {
 
     public StringProperty romUsageDetailProperty() {
         return romUsageDetail;
+    }
+
+    public String getDirectoryUsageDetail() {
+        return directoryUsageDetail.get();
+    }
+
+    public StringProperty directoryUsageDetailProperty() {
+        return directoryUsageDetail;
+    }
+
+    public void setDirectoryUsageDetail(String directoryUsageDetail) {
+        this.directoryUsageDetail.set(directoryUsageDetail);
+    }
+
+    public double getDirectoryUsage() {
+        return directoryUsage.get();
+    }
+
+    public DoubleProperty directoryUsageProperty() {
+        return directoryUsage;
+    }
+
+    public void setDirectoryUsage(double directoryUsage) {
+        this.directoryUsage.set(directoryUsage);
     }
 
     public IntegerProperty backgroundTaskCountProperty() {
