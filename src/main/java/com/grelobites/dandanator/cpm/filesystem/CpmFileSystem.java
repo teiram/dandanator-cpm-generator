@@ -1,6 +1,7 @@
 package com.grelobites.dandanator.cpm.filesystem;
 
 import com.grelobites.dandanator.cpm.model.Archive;
+import com.grelobites.dandanator.cpm.model.ArchiveOperationException;
 import com.grelobites.dandanator.cpm.model.FileSystem;
 import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import com.grelobites.dandanator.cpm.util.Util;
@@ -35,7 +36,7 @@ public class CpmFileSystem implements FileSystem {
     }
 
     private int getNeededDirectoryEntries(Archive archive) {
-        return (archive.getSize() >> CpmConstants.LOGICAL_EXTENT_MASK)
+        return (archive.getSize() >> CpmConstants.LOGICAL_EXTENT_SHIFT)
                 + ((archive.getSize() & (CpmConstants.LOGICAL_EXTENT_SIZE - 1)) != 0 ? 1 : 0);
     }
 
@@ -46,15 +47,15 @@ public class CpmFileSystem implements FileSystem {
     @Override
     public void addArchive(Archive archive) {
         if (archiveList.contains(archive)) {
-            throw new IllegalArgumentException("Archive already added to filesystem");
+            throw new ArchiveOperationException("archiveAlreadyExists");
         } else {
             int neededBytes = getNeededBytes(archive);
             if (neededBytes > freeBytes) {
-                throw new IllegalArgumentException("Not enough free space to add file");
+                throw new ArchiveOperationException("exhaustedFileSystemSpace");
             }
             int neededDirectoryEntries = getNeededDirectoryEntries(archive);
             if (neededDirectoryEntries > freeDirectoryEntries()) {
-                throw new IllegalArgumentException("Not enough free directory entries");
+                throw new ArchiveOperationException("exhaustedDirectoryEntries");
             }
             LOGGER.debug("Archive " + archive + " needs " + neededBytes + " bytes "
                 + " and " + neededDirectoryEntries + " directory entries");
@@ -62,6 +63,13 @@ public class CpmFileSystem implements FileSystem {
             freeBytes -= neededBytes;
             freeDirectoryEntries -= neededDirectoryEntries;
         }
+    }
+
+    @Override
+    public void clear() {
+        archiveList.clear();
+        freeBytes = totalBytes;
+        freeDirectoryEntries = parameters.getDirectoryEntries();
     }
 
     @Override
@@ -113,7 +121,8 @@ public class CpmFileSystem implements FileSystem {
     }
 
     private static Archive getArchiveFromDirectoryEntry(CpmDirectoryEntry[] directoryEntries, int index,
-                                                        byte[] data, FileSystemParameters parameters) {
+                                                        byte[] data, FileSystemParameters parameters,
+                                                        int offset) {
         final CpmDirectoryEntry entry = directoryEntries[index];
         if (entry.getUserArea() != CpmConstants.UNUSED_ENTRY_USER) {
             LOGGER.debug("Getting extents for archive " + entry.getName()
@@ -130,20 +139,24 @@ public class CpmFileSystem implements FileSystem {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 //Assuming that the blocks are ordered
                 for (CpmDirectoryEntry extent : fileExtents) {
-                    LOGGER.debug("Processing extent " + extent);
                     int records = extent.getRecordCount();
+                    int lastRecordBytes = extent.getByteCount() == 0 ? 128 : extent.getByteCount();
+                    LOGGER.debug("Processing extent " + extent);
                     for (int block : extent.getAllocatedBlocks()) {
                         if (block > 0) {
                             LOGGER.debug("Fetching data for block " + block);
                             try {
                                 int from = block * parameters.getBlockSize();
-                                int to = Math.min(
-                                        (block + 1) * parameters.getBlockSize(),
-                                        from + (records << 7));
+                                int to = from;
+                                if ((records << CpmConstants.RECORD_SHIFT) <= parameters.getBlockSize()) {
+                                    to += ((records - 1) << CpmConstants.RECORD_SHIFT) + lastRecordBytes;
+                                } else {
+                                    to += parameters.getBlockSize();
+                                }
                                 LOGGER.debug("Calculated data range from " + from + " to " + to
                                     + ", size: " + (to - from) + " bytes");
-                                bos.write(Arrays.copyOfRange(data, from, to));
-                                records -= (to - from) >> 7;
+                                bos.write(Arrays.copyOfRange(data, from + offset, to + offset));
+                                records -= (to - from) >> CpmConstants.RECORD_SHIFT;
                             } catch (Exception e) {
                                 LOGGER.error("Getting file data", e);
                             }
@@ -164,14 +177,16 @@ public class CpmFileSystem implements FileSystem {
     public static CpmFileSystem fromByteArray(byte[] data, FileSystemParameters parameters) {
         CpmDirectoryEntry[] directoryEntries = new CpmDirectoryEntry[parameters.getDirectoryEntries()];
         int offset = parameters.getReservedTracks() * parameters.getSectorsByTrack() * parameters.getSectorSize();
+        int directoryOffset = offset;
         for (int i = 0; i < directoryEntries.length; i++) {
-            directoryEntries[i] = CpmDirectoryEntry.fromByteArray(parameters, data, offset);
-            offset += CpmConstants.DIRECTORY_ENTRY_SIZE;
+            directoryEntries[i] = CpmDirectoryEntry.fromByteArray(parameters, data, directoryOffset);
+            LOGGER.debug("-- Directory entry " + directoryEntries[i]);
+            directoryOffset += CpmConstants.DIRECTORY_ENTRY_SIZE;
         }
         CpmFileSystem fileSystem = new CpmFileSystem(parameters);
         //Recreate now the files
         for (int i = 0; i < directoryEntries.length; i++) {
-            Archive archive = getArchiveFromDirectoryEntry(directoryEntries, i, data, parameters);
+            Archive archive = getArchiveFromDirectoryEntry(directoryEntries, i, data, parameters, offset);
             if (archive != null) {
                 LOGGER.debug("Adding archive " + archive);
                 fileSystem.addArchive(archive);
@@ -205,6 +220,7 @@ public class CpmFileSystem implements FileSystem {
                     currentBlock++;
                     dataOffset += parameters.getBlockSize();
                 }
+                int lastRecordBytes = archive.getSize() & (CpmConstants.RECORD_SIZE - 1);
                 CpmDirectoryEntry directoryEntry = new CpmDirectoryEntry(
                         archive.getName(),
                         archive.getExtension(),
@@ -212,8 +228,9 @@ public class CpmFileSystem implements FileSystem {
                         archive.getFlags(),
                         extent++,
                         allocatedBlocks,
-                        Util.roundToNearestMultiple(realRequestedSize, CpmConstants.RECORD_SIZE) / CpmConstants.RECORD_SIZE,
-                        0);
+                        Util.roundToNearestMultiple(realRequestedSize,
+                                CpmConstants.RECORD_SIZE) >> CpmConstants.RECORD_SHIFT,
+                        lastRecordBytes);
                 LOGGER.debug("Creating new directory entry " + directoryEntry);
                 directoryEntries[currentDirectoryEntry++] = directoryEntry;
                 remaining -= requestedSize;

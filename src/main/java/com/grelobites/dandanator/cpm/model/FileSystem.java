@@ -7,6 +7,8 @@ public interface FileSystem {
 
     void removeArchive(Archive archive);
 
+    void clear();
+
     List<Archive> getArchiveList();
 
     int totalBytes();

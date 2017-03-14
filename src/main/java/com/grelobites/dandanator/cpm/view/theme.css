@@ -1,7 +1,7 @@
 .root {
     -fx-background-color: #2a2a2a;
     -fx-base: #111111;
-    -fx-accent: #102c9c;
+    -fx-accent: #109c2c;
 }
 
 .progress-indicator:indeterminate .segment {
@@ -29,6 +29,8 @@
 
 .table-view .table-cell {
     -fx-text-fill: white;
+    -fx-font-family: monospace;
+    -fx-font-size: 13px;
 }
 
 .table-row-cell {
@@ -136,32 +138,4 @@
 
 .red-text {
     -fx-text-fill : red;
-}
-
-.pagination-simple {
-    -fx-arrows-visible: false;
-    -fx-tooltip-visible: false;
-    -fx-page-information-visible: false;
-}
-
-.pagination-simple > .page {
-    -fx-background-color: #2a2a2a;
-}
-
-.pagination-simple > .pagination-control {
-    -fx-translate-y: -24px;
-}
-
-.button-play {
-    -fx-background-image: url("/player/playback-start.png");
-    -fx-background-size: 18px;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
-}
-
-.button-stop {
-    -fx-background-image: url("/player/playback-stop.png");
-    -fx-background-size: 18px;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
 }

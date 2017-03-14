@@ -2,11 +2,14 @@ package com.grelobites.dandanator.cpm.view;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
+import com.grelobites.dandanator.cpm.filesystem.CpmConstants;
 import com.grelobites.dandanator.cpm.model.Archive;
+import com.grelobites.dandanator.cpm.model.ArchiveOperationException;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
 import com.grelobites.dandanator.cpm.util.ArchiveUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.OperationResult;
+import com.grelobites.dandanator.cpm.util.Util;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
 import com.grelobites.dandanator.cpm.view.util.DirectoryAwareFileChooser;
 import javafx.application.Platform;
@@ -131,18 +134,33 @@ public class MainAppController {
     }
 
     private void addArchivesFromFiles(List<File> files) {
-        files.forEach(file -> {
-            try {
+        try {
+            for (File file : files) {
                 List<Archive> archives = ArchiveUtil.getArchivesInFile(applicationContext, file);
                 LOGGER.debug("Returned list of archives " + archives);
                 for (Archive archive : archives) {
+                    if (!filterUserAreaPicker.isDisable()) {
+                        archive.setUserArea(filterUserAreaPicker.getUserArea());
+                    }
                     getRomSetHandler().addArchive(archive);
                 }
-            } catch (Exception e) {
-                LOGGER.error("In addArchivesFromFiles", e);
-
             }
-        });
+        } catch (ArchiveOperationException aoe) {
+            LOGGER.error("Adding archives", aoe);
+            DialogUtil.buildErrorAlert(
+                    LocaleUtil.i18n("archiveAddError"),
+                    LocaleUtil.i18n("archiveAddErrorHeader"),
+                    LocaleUtil.i18n(aoe.getMessageKey()))
+                    .showAndWait();
+
+        } catch (Exception e) {
+            LOGGER.error("Adding archives", e);
+            DialogUtil.buildErrorAlert(
+                    LocaleUtil.i18n("archiveAddError"),
+                    LocaleUtil.i18n("archiveAddErrorHeader"),
+                    LocaleUtil.i18n("archiveAddGenericError"))
+                    .showAndWait();
+        }
     }
 
     @FXML
@@ -250,6 +268,9 @@ public class MainAppController {
 
         archiveNameColumn.setCellValueFactory(
                 cellData -> cellData.getValue().nameProperty()
+                        .concat(Util.spacePadding(
+                                CpmConstants.FILENAME_MAXLENGTH -
+                                        cellData.getValue().nameProperty().get().length()))
                         .concat(Constants.FILE_EXTENSION_SEPARATOR)
                         .concat(cellData.getValue().extensionProperty()));
 
@@ -327,8 +348,8 @@ public class MainAppController {
                             LocaleUtil.i18n("archiveDeletionConfirmContent"))
                     .showAndWait();
 
-            if (result.orElse(ButtonType.CANCEL) == ButtonType.OK){
-                applicationContext.getArchiveList().clear();
+            if (result.orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                applicationContext.getRomSetHandler().clear();
             }
         });
 

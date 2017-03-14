@@ -79,22 +79,20 @@ public class SimpleRomSetHandler implements RomSetHandler {
     @Override
     public void removeArchive(Archive archive) {
         LOGGER.debug("removeArchive " + archive);
-        try {
-            fileSystem.removeArchive(archive);
-            applicationContext.getArchiveList().remove(archive);
-        } catch (Exception e) {
-            LOGGER.error("Removing archive " + archive, e);
-        }
+        fileSystem.removeArchive(archive);
+        applicationContext.getArchiveList().remove(archive);
     }
 
     @Override
     public void addArchive(Archive archive) {
         LOGGER.debug("addArchive " + archive);
-        try {
-            fileSystem.addArchive(archive);
-            applicationContext.getArchiveList().add(archive);
-        } catch (Exception e) {
-            LOGGER.error("Adding archive " + archive, e);
-        }
+        fileSystem.addArchive(archive);
+        applicationContext.getArchiveList().add(archive);
+    }
+
+    @Override
+    public void clear() {
+        fileSystem.clear();
+        applicationContext.getArchiveList().clear();
     }
 }

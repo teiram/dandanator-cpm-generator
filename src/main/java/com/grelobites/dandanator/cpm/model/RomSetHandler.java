@@ -12,6 +12,8 @@ public interface RomSetHandler {
     
     void exportRomSet(OutputStream romset) throws IOException;
 
+    void clear();
+
     void removeArchive(Archive archive);
 
     void addArchive(Archive archive);

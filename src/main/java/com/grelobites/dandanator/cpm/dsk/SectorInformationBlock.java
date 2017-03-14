@@ -14,6 +14,7 @@ public class SectorInformationBlock {
     private int sectorSize;
     private int fdcStatusRegister1;
     private int fdcStatusRegister2;
+    private int physicalPosition;
 
     public static SectorInformationBlock fromInputStream(InputStream data) throws IOException {
         return fromByteArray(Util.fromInputStream(data, 8));
@@ -24,7 +25,7 @@ public class SectorInformationBlock {
         ByteBuffer header = ByteBuffer.wrap(data);
         block.track = header.get();
         block.side = header.get();
-        block.sectorId = header.get();
+        block.sectorId = header.get() & 0xff;
         block.sectorSize = header.get();
         block.fdcStatusRegister1 = header.get();
         block.fdcStatusRegister2 = header.get();
@@ -56,15 +57,24 @@ public class SectorInformationBlock {
         return fdcStatusRegister2;
     }
 
+    public int getPhysicalPosition() {
+        return physicalPosition;
+    }
+
+    public void setPhysicalPosition(int physicalPosition) {
+        this.physicalPosition = physicalPosition;
+    }
+
     @Override
     public String toString() {
         return "SectorInformationBlock{" +
                 "track=" + track +
                 ", side=" + side +
-                ", sectorId=" + sectorId +
+                ", sectorId=0x" + Integer.toHexString(sectorId) +
                 ", sectorSize=" + sectorSize +
                 ", fdcStatusRegister1=" + fdcStatusRegister1 +
                 ", fdcStatusRegister2=" + fdcStatusRegister2 +
+                ", physicalPosition=" + physicalPosition +
                 '}';
     }
 }

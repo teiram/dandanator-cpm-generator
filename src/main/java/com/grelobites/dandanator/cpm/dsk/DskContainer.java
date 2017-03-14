@@ -25,8 +25,7 @@ public class DskContainer {
         Track[] tracks = new Track[diskInformationBlock.getTrackCount()];
         for (int i = 0; i < diskInformationBlock.getTrackCount(); i++) {
             TrackInformationBlock trackInformationBlock = TrackInformationBlock.fromInputStream(data);
-            Track track = new Track(trackInformationBlock,
-                    trackInformationBlock.getSectorCount(), trackInformationBlock.getSectorSize());
+            Track track = new Track(trackInformationBlock);
             for (int j = 0; j < trackInformationBlock.getSectorCount(); j++) {
                 track.setSectorData(j, Util.fromInputStream(data, trackInformationBlock.getSectorSize()));
             }
@@ -38,7 +37,7 @@ public class DskContainer {
     public void dumpRawData(OutputStream os) throws IOException {
         for (Track track : tracks) {
             LOGGER.debug("Dumping information for track " + track.getInformation());
-            for (int i = 0; i < track.getInformation().getSectorCount(); i++) {
+            for (int i : track.orderedSectorList()) {
                 LOGGER.debug("Dumping data for sector " + track.getInformation().getSectorInformation(i));
                 os.write(track.getSectorData(i));
             }

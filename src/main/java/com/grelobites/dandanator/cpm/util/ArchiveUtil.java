@@ -2,11 +2,16 @@ package com.grelobites.dandanator.cpm.util;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
+import com.grelobites.dandanator.cpm.dsk.DskContainer;
+import com.grelobites.dandanator.cpm.dsk.DskUtil;
 import com.grelobites.dandanator.cpm.filesystem.CpmFileSystem;
 import com.grelobites.dandanator.cpm.model.Archive;
+import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,6 +95,16 @@ public class ArchiveUtil {
         return archive;
     }
 
+    private static CpmFileSystem getFileSystemFromDsk(byte[] data) throws IOException {
+        DskContainer container = DskContainer.fromInputStream(new ByteArrayInputStream(data));
+        FileSystemParameters parameters = DskUtil.guessFileSystemParameters(container);
+        LOGGER.debug("FileSystem parameters guessed as " + parameters);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        container.dumpRawData(bos);
+        return  CpmFileSystem.fromByteArray(bos.toByteArray(), parameters);
+    }
+
     public static List<Archive> getArchivesInFile(ApplicationContext context, File file) throws IOException {
         LOGGER.debug("getArchivesInFile " + file);
         switch (guessFileType(file)) {
@@ -100,6 +115,9 @@ public class ArchiveUtil {
                 CpmFileSystem fs = CpmFileSystem.fromByteArray(Files.readAllBytes(file.toPath()),
                         Constants.PLUS3_FS_PARAMETERS);
                 return fs.getArchiveList();
+            case DSK:
+                return getFileSystemFromDsk(Files.readAllBytes(file.toPath()))
+                        .getArchiveList();
             default:
                 throw new IllegalArgumentException("Not implemented yet");
         }

@@ -55,7 +55,9 @@ public class TrackInformationBlock {
         byte[] sectorInfoBytes = new byte[8];
         for (int i = 0; i < block.sectorCount; i++) {
             header.get(sectorInfoBytes);
-            block.sectorInformationList[i] = SectorInformationBlock.fromByteArray(sectorInfoBytes);
+            SectorInformationBlock sectorInformationBlock = SectorInformationBlock.fromByteArray(sectorInfoBytes);
+            sectorInformationBlock.setPhysicalPosition(i);
+            block.sectorInformationList[i] = sectorInformationBlock;
         }
 
         return block;
