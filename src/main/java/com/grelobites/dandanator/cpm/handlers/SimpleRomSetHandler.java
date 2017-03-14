@@ -61,6 +61,9 @@ public class SimpleRomSetHandler implements RomSetHandler {
     @Override
     public void importRomSet(InputStream romset) throws IOException {
         LOGGER.debug("importRomSet " + romset);
+        fileSystem.clear();
+        applicationContext.getArchiveList().clear();
+        mergeRomSet(romset);
     }
 
     @Override

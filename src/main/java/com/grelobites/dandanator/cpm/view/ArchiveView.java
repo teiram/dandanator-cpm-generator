@@ -31,9 +31,9 @@ public class ArchiveView {
     private ChangeListener<Boolean> readOnlyAttributeChangeListener = (observable, oldValue, newValue) ->
             updateAttribute(ArchiveFlags.READ_ONLY, newValue);
     private ChangeListener<Boolean> systemAttributeChangeListener = (observable, oldValue, newValue) ->
-            updateAttribute(ArchiveFlags.READ_ONLY, newValue);
+            updateAttribute(ArchiveFlags.SYSTEM, newValue);
     private ChangeListener<Boolean> archivedAttributeChangeListener = (observable, oldValue, newValue) ->
-            updateAttribute(ArchiveFlags.READ_ONLY, newValue);
+            updateAttribute(ArchiveFlags.ARCHIVED, newValue);
 
     private TextFormatter<String> getCpmTextFormatter(final int maxLength) {
         return new TextFormatter<>((UnaryOperator<TextFormatter.Change>)  c -> {

@@ -129,6 +129,13 @@ public class ArchiveUtil {
         }
     }
 
+    public static File toTemporaryFile(Archive sourceArchive) throws IOException {
+        File file = new File(new File(System.getProperty("java.io.tmpdir")),
+                String.format("%s.%s", sourceArchive.getName().trim(), sourceArchive.getExtension().trim()));
+        exportAsFile(sourceArchive, file);
+        return file;
+    }
+
     public static String toCpmValidName(String newValue, int maxLength) {
         StringBuilder result = new StringBuilder();
         for (Character c : newValue.toCharArray()) {

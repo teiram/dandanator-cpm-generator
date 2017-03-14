@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -214,48 +215,21 @@ public class MainAppController {
                 if (!row.isEmpty()) {
                     Integer index = row.getIndex();
                     LOGGER.debug("Dragging content of row " + index);
-                    Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                    Dragboard db = row.startDragAndDrop(TransferMode.ANY);
                     db.setDragView(row.snapshot(null, null));
                     ClipboardContent cc = new ClipboardContent();
-                    cc.put(SERIALIZED_MIME_TYPE, index);
-                    db.setContent(cc);
-                    event.consume();
-                }
-            });
-
-            row.setOnDragOver(event -> {
-                Dragboard db = event.getDragboard();
-                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                    if (row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
-                        event.acceptTransferModes(TransferMode.MOVE);
+                    try {
+                        cc.putFiles(Collections.singletonList(ArchiveUtil.toTemporaryFile(row.getItem())));
+                        db.setContent(cc);
                         event.consume();
+                    } catch (Exception e) {
+                        LOGGER.error("In drag operation", e);
                     }
                 }
             });
 
-            row.setOnDragDropped(event -> {
-                Dragboard db = event.getDragboard();
-                LOGGER.debug("row.setOnDragDropped: " + db);
-                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                    int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-                    Archive draggedArchive = archiveTable.getItems().remove(draggedIndex);
-
-                    int dropIndex ;
-
-                    if (row.isEmpty()) {
-                        dropIndex = archiveTable.getItems().size();
-                    } else {
-                        dropIndex = row.getIndex();
-                    }
-
-                    archiveTable.getItems().add(dropIndex, draggedArchive);
-
-                    event.setDropCompleted(true);
-                    archiveTable.getSelectionModel().select(dropIndex);
-                    event.consume();
-                } else {
-                    LOGGER.debug("Dragboard content is not of the required type");
-                }
+            row.setOnDragDone(event -> {
+                event.consume();
             });
 
             row.setOnMouseClicked(e -> {
@@ -282,7 +256,7 @@ public class MainAppController {
 
 
         archiveTable.setOnDragOver(event -> {
-            if (event.getGestureSource() != archiveTable &&
+            if (event.getGestureSource() == null &&
                     event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }

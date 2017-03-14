@@ -192,8 +192,8 @@ public class ApplicationContext {
         Archive archive = selectedArchive.get();
         if (archive != null) {
             DirectoryAwareFileChooser chooser = getFileChooser();
-            chooser.setTitle(LocaleUtil.i18n("exportCurrentInstallable"));
-            chooser.setInitialFileName(archive.getName());
+            chooser.setTitle(LocaleUtil.i18n("exportCurrentArchive"));
+            chooser.setInitialFileName(String.format("%s.%s", archive.getName().trim(), archive.getExtension().trim()));
             final File saveFile = chooser.showSaveDialog(applicationStage.getScene().getWindow());
             if (saveFile != null) {
                 try {
@@ -203,9 +203,9 @@ public class ApplicationContext {
                 }
             }
         } else {
-            DialogUtil.buildWarningAlert(LocaleUtil.i18n("exportCurrentInstallablerrorTitle"),
-                    LocaleUtil.i18n("exportCurrentInstallableErrorHeader"),
-                    LocaleUtil.i18n("exportCurrentInstallableErrorContentNoInstallableSelected")).showAndWait();
+            DialogUtil.buildWarningAlert(LocaleUtil.i18n("exportCurrentArchiveErrorTitle"),
+                    LocaleUtil.i18n("exportCurrentArchiveErrorHeader"),
+                    LocaleUtil.i18n("exportCurrentArchiveNoArchiveSelected")).showAndWait();
         }
     }
 
