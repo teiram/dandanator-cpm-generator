@@ -1,27 +1,44 @@
 package com.grelobites.dandanator.cpm;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Preferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
+    private static final String BOOTIMAGEPATH_PROPERTY = "bootImagePath";
+    private static final String EMSBINARYPATH_PROPERTY = "emsBinaryPath";
     byte[] bootImage;
     byte[] emsBinary;
 
-
     private StringProperty bootImagePath;
     private StringProperty emsBinaryPath;
+
+    private BooleanProperty validPreferences;
 
     private static Preferences INSTANCE;
 
     private Preferences() {
         this.bootImagePath = new SimpleStringProperty();
         this.emsBinaryPath = new SimpleStringProperty();
+        this.validPreferences = new SimpleBooleanProperty(false);
+        this.validPreferences.bind(emsBinaryPath.isNotEmpty());
+
+        this.bootImagePath.addListener((observable, oldValue, newValue) -> {
+            persistConfigurationValue(BOOTIMAGEPATH_PROPERTY, newValue);
+
+        });
+        this.emsBinaryPath.addListener((observable, oldValue, newValue) -> {
+            persistConfigurationValue(EMSBINARYPATH_PROPERTY, newValue);
+        });
     }
 
     public static Preferences getInstance() {
@@ -32,12 +49,16 @@ public class Preferences {
     }
 
     synchronized private static Preferences newInstance() {
-        return new Preferences();
+        return setFromPreferences(new Preferences());
     }
 
     public byte[] getBootImage() throws IOException {
         if (bootImage == null) {
-            bootImage = Constants.getDefaultBootScreen();
+            if (getBootImagePath() != null) {
+                bootImage = Files.readAllBytes(Paths.get(getBootImagePath()));
+            } else {
+                bootImage = Constants.getDefaultBootScreen();
+            }
         }
         return bootImage;
     }
@@ -48,7 +69,7 @@ public class Preferences {
 
     public byte[] getEmsBinary() throws IOException {
         if (emsBinary == null) {
-            emsBinary = Constants.getDefaultEmsBinary();
+            emsBinary = Files.readAllBytes(Paths.get(getEmsBinaryPath()));
         }
         return emsBinary;
     }
@@ -67,6 +88,7 @@ public class Preferences {
 
     public void setBootImagePath(String bootImagePath) {
         this.bootImagePath.set(bootImagePath);
+        bootImage = null;
     }
 
     public String getEmsBinaryPath() {
@@ -79,6 +101,35 @@ public class Preferences {
 
     public void setEmsBinaryPath(String emsBinaryPath) {
         this.emsBinaryPath.set(emsBinaryPath);
+    }
+
+    public boolean isValidPreferences() {
+        return validPreferences.get();
+    }
+
+    public BooleanProperty validPreferencesProperty() {
+        return validPreferences;
+    }
+
+    public static java.util.prefs.Preferences getApplicationPreferences() {
+        return java.util.prefs.Preferences.userNodeForPackage(Preferences.class);
+    }
+
+    private static Preferences setFromPreferences(Preferences preferences) {
+        java.util.prefs.Preferences p = getApplicationPreferences();
+        preferences.setBootImagePath(p.get(BOOTIMAGEPATH_PROPERTY, null));
+        preferences.setEmsBinaryPath(p.get(EMSBINARYPATH_PROPERTY, null));
+        return preferences;
+    }
+
+    public static void persistConfigurationValue(String key, String value) {
+        LOGGER.debug("persistConfigurationValue " + key + ", " + value);
+        java.util.prefs.Preferences p = getApplicationPreferences();
+        if (value != null) {
+            p.put(key, value);
+        } else {
+            p.remove(key);
+        }
     }
 
 }

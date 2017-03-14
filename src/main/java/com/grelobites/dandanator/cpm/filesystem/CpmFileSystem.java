@@ -44,9 +44,17 @@ public class CpmFileSystem implements FileSystem {
         return Util.roundToNearestMultiple(archive.getSize(), parameters.getBlockSize());
     }
 
+    private boolean isArchiveNameConflict(Archive archive) {
+        return archiveList.stream().filter(item ->
+                item.getName().trim().equals(archive.getName().trim()) &&
+                item.getExtension().trim().equals(archive.getExtension().trim()) &&
+                item.getUserArea() == archive.getUserArea())
+                .count() > 0;
+    }
+
     @Override
     public void addArchive(Archive archive) {
-        if (archiveList.contains(archive)) {
+        if (archiveList.contains(archive) || isArchiveNameConflict(archive)) {
             throw new ArchiveOperationException("archiveAlreadyExists");
         } else {
             int neededBytes = getNeededBytes(archive);

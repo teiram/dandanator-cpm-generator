@@ -11,7 +11,9 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="325.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grelobites.dandanator.cpm.view.PreferencesController">
    <children>
       <ImageView fx:id="bootImageView" fitHeight="192.0" fitWidth="256.0" layoutX="63.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true" />
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="220.0" prefHeight="23.0" prefWidth="379.0" spacing="10.0">
+      <Label fx:id="emsBinaryPath" layoutX="40.0" layoutY="289.0" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="343.0" text="Ninguno" textOverrun="LEADING_ELLIPSIS" />
+      <Label fx:id="bootImagePath" layoutX="40.0" layoutY="243.0" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="343.0" text="Integrada" textOverrun="LEADING_ELLIPSIS" />
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="215.0" prefHeight="23.0" prefWidth="379.0" spacing="10.0">
          <children>
             <Label maxWidth="1.7976931348623157E308" text="%bootImageMessage" HBox.hgrow="ALWAYS">
                <font>
@@ -30,7 +32,7 @@
             <Insets left="5.0" />
          </padding>
       </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="250.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="23.0" prefWidth="379.0" spacing="10.0">
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="264.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="23.0" prefWidth="379.0" spacing="10.0">
          <children>
             <Label contentDisplay="CENTER" maxWidth="1.7976931348623157E308" text="%emsPathMessage" HBox.hgrow="ALWAYS">
                <font>

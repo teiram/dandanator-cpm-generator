@@ -46,9 +46,9 @@ public class ArchiveView {
                 int correctedLength = filteredName.length();
                 c.setText(filteredName);
                 c.setRange(0, oldLength);
-                c.setCaretPosition(c.getCaretPosition() - (newLength - correctedLength));
+                c.setCaretPosition(Math.max(0, c.getCaretPosition() - (newLength - correctedLength)));
 
-                c.setAnchor(c.getAnchor() - (newLength - correctedLength));
+                c.setAnchor(Math.max(0, c.getAnchor() - (newLength - correctedLength)));
                 LOGGER.debug("Change updated to " + c);
             }
             return c;

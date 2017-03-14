@@ -8,6 +8,7 @@ import java.io.IOException;
 public class Constants {
     private static final String DEFAULT_VERSION = "1.0";
 
+    public static final int SLOT_SIZE = 0x4000;
     public static final int MAX_EMS_FILE_SIZE = 0x4000 * 2;
 	public static final int SPECTRUM_SCREEN_WIDTH = 256;
 	public static final int SPECTRUM_SCREEN_HEIGHT = 192;
@@ -25,7 +26,7 @@ public class Constants {
 
     public static final FileSystemParameters ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
-                    .withBlockCount(224)
+                    .withBlockCount(240)
                     .withBlockSize(2048)
                     .withDirectoryEntries(128)
                     .withSectorsByTrack(9)

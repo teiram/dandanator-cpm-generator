@@ -63,7 +63,15 @@
                               <HBox alignment="CENTER" fillHeight="false">
                                  <children>
                                     <Label maxWidth="1.7976931348623157E308" text="%archiveSize" HBox.hgrow="ALWAYS" />
-                                    <Label fx:id="archiveSize" text="0" />
+                                    <Label fx:id="archiveSize" text="0">
+                                       <HBox.margin>
+                                          <Insets right="20.0" />
+                                       </HBox.margin></Label>
+                                    <Label maxWidth="1.7976931348623157E308" text="bytes">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </Label>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" fillHeight="false">

@@ -144,6 +144,6 @@ public class ArchiveUtil {
                 break;
             }
         }
-        return result.toString().toUpperCase();
+        return result.toString().toUpperCase().trim();
     }
 }

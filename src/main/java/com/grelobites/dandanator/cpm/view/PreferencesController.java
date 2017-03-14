@@ -5,8 +5,10 @@ import com.grelobites.dandanator.cpm.Preferences;
 import com.grelobites.dandanator.cpm.util.ImageUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
@@ -30,10 +32,16 @@ public class PreferencesController {
     private Button changeBootImageButton;
 
     @FXML
+    private Label bootImagePath;
+
+    @FXML
     private Button resetBootImageButton;
 
     @FXML
     private Button changeEmsBinaryPathButton;
+
+    @FXML
+    private Label emsBinaryPath;
 
     @FXML
     private Button resetEmsBinaryPathButton;
@@ -97,6 +105,15 @@ public class PreferencesController {
             }
         });
 
+        bootImagePath.textProperty().bind(Bindings.createStringBinding(() -> {
+            Preferences preferences = Preferences.getInstance();
+            if (preferences.getBootImagePath() == null) {
+                return LocaleUtil.i18n("builtInValue");
+            } else {
+                return preferences.getBootImagePath();
+            }
+        }, Preferences.getInstance().bootImagePathProperty()));
+
         resetBootImageButton.setOnAction(event -> {
             try {
                 Preferences.getInstance().setBootImagePath(null);
@@ -119,7 +136,7 @@ public class PreferencesController {
         Preferences configuration = Preferences.getInstance();
         changeEmsBinaryPathButton.setOnAction(event -> {
             FileChooser chooser = new FileChooser();
-            chooser.setTitle(LocaleUtil.i18n("selectNewEmsMessage"));
+            chooser.setTitle(LocaleUtil.i18n("selectEmsMessage"));
             final File emsFile = chooser.showOpenDialog(changeEmsBinaryPathButton.getScene().getWindow());
             if (emsFile != null) {
                 try {
@@ -137,6 +154,15 @@ public class PreferencesController {
                 LOGGER.error("Resetting EMS Path", e);
             }
         });
+        emsBinaryPath.textProperty().bind(Bindings.createStringBinding(() -> {
+            Preferences preferences = Preferences.getInstance();
+            if (preferences.getEmsBinaryPath() == null) {
+                return LocaleUtil.i18n("notDefinedValue");
+            } else {
+                return preferences.getEmsBinaryPath();
+            }
+        }, Preferences.getInstance().emsBinaryPathProperty()));
+
     }
 
     @FXML

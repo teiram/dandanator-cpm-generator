@@ -2,6 +2,7 @@ package com.grelobites.dandanator.cpm.view;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
+import com.grelobites.dandanator.cpm.Preferences;
 import com.grelobites.dandanator.cpm.filesystem.CpmConstants;
 import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.ArchiveOperationException;
@@ -281,7 +282,9 @@ public class MainAppController {
             event.consume();
         });
 
-        createRomButton.setDisable(false);
+        createRomButton.disableProperty().bind(
+                Preferences.getInstance().validPreferencesProperty().not());
+
         createRomButton.setOnAction(c -> {
             DirectoryAwareFileChooser chooser = applicationContext.getFileChooser();
             chooser.setTitle(LocaleUtil.i18n("saveRomSet"));

@@ -2,10 +2,9 @@ package com.grelobites.dandanator.cpm.handlers;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
-import com.grelobites.dandanator.cpm.filesystem.CpmDirectoryEntry;
+import com.grelobites.dandanator.cpm.Preferences;
 import com.grelobites.dandanator.cpm.filesystem.CpmFileSystem;
 import com.grelobites.dandanator.cpm.model.Archive;
-import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.Util;
@@ -16,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class SimpleRomSetHandler implements RomSetHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRomSetHandler.class);
@@ -66,16 +67,53 @@ public class SimpleRomSetHandler implements RomSetHandler {
         mergeRomSet(romset);
     }
 
+    protected static void fillWithValue(OutputStream os, byte value, int size) throws IOException {
+        for (int i = 0; i < size; i++) {
+            os.write(value);
+        }
+    }
+
     @Override
     public void exportRomSet(OutputStream romset) throws IOException {
         LOGGER.debug("exportRomSet " + romset);
-        romset.write(Util.fromInputStream(SimpleRomSetHandler.class.getResourceAsStream("/ddntr_eeprom.bin"),
-                16384 * 3));
-        CpmFileSystem fileSystem = new CpmFileSystem(Constants.ROMSET_FS_PARAMETERS);
-        applicationContext.getArchiveList().forEach(f -> fileSystem.addArchive(f));
+        ByteBuffer buffer = ByteBuffer.wrap(Util.fromInputStream(SimpleRomSetHandler.class
+                .getResourceAsStream("/loader.bin")));
+        buffer.order(ByteOrder.LITTLE_ENDIAN).position(4);
+        buffer.putShort(Integer.valueOf(1).shortValue()); //TODO: Set proper version here
+
+        int offset = buffer.array().length;
+        LOGGER.debug("Writing driver at offset " + offset);
+
+        byte[] driver = Util.fromInputStream(SimpleRomSetHandler.class
+            .getResourceAsStream("/dandanator_fid_driver.bin"));
+        buffer.putShort(Integer.valueOf(offset).shortValue());
+        buffer.putShort(Integer.valueOf(driver.length).shortValue());
+
+        offset += driver.length;
+        LOGGER.debug("Writing screen at offset " + offset);
+
+        byte[] screen = Preferences.getInstance().getBootImage();
+        buffer.putShort(Integer.valueOf(offset).shortValue());
+        buffer.putShort(Integer.valueOf(screen.length).shortValue());
+
+        romset.write(buffer.array());
+        romset.write(driver);
+        romset.write(screen);
+
+        offset += screen.length;
+
+        fillWithValue(romset, (byte) 0, Constants.SLOT_SIZE - offset);
+
+        //Write EMS on second slot
+        offset = Constants.SLOT_SIZE;
+
+        byte[] emsFile = Preferences.getInstance().getEmsBinary();
+        romset.write(emsFile);
+        offset += emsFile.length;
+
+        fillWithValue(romset, (byte) 0, (Constants.SLOT_SIZE * 3) - offset);
+
         romset.write(fileSystem.asByteArray());
-        romset.write(Util.fromInputStream(SimpleRomSetHandler.class.getResourceAsStream("/slot31.raw"),
-                16384));
         romset.flush();
     }
 
