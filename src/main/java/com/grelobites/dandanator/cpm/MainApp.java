@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class MainApp extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainApp.class);
-    private static final String APP_NAME = "Dandanator CP/M Generator";
+    private static final String APP_NAME = "Dandanator CP/M ROM Generator";
 
 	private Stage primaryStage;
     private Stage preferencesStage;
@@ -265,11 +265,10 @@ public class MainApp extends Application {
 	private void initRootLayout() {
 		try {
 		    applicationContext = new ApplicationContext();
-		    primaryStage.setTitle("Dandanator CP/M Rom Generator");
+		    primaryStage.setTitle(APP_NAME);
             primaryStage.setOnCloseRequest(e -> Platform.exit());
             BorderPane mainPane = new BorderPane();
             Scene scene = new Scene(mainPane);
-            //scene.getStylesheets().add(Constants.getThemeResourceUrl());
             menuToolkit = MenuToolkit.toolkit(Locale.getDefault());
             MenuBar menuBar = initMenuBar();
             if (menuToolkit == null) {

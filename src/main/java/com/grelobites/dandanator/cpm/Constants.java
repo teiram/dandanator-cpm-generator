@@ -70,11 +70,15 @@ public class Constants {
 
     private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
     private static final String THEME_RESOURCE = "view/theme.css";
+    public static final int ROMSET_HEADER_SIZE = 4;
+    public static final byte[] ROMSET_HEADER = new byte[] {(byte) 0xF3, (byte) 0xC3, (byte) 0x00, (byte) 0x01};
 
 
     private static byte[] DEFAULT_BOOT_IMAGE;
 
     private static String THEME_RESOURCE_URL;
+    public static final long ROMSET_SIZE = SLOT_SIZE * 32;
+
 
     public static String currentVersion() {
         String version = Constants.class.getPackage()

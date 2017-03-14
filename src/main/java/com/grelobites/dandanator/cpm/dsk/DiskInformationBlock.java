@@ -9,6 +9,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 public class DiskInformationBlock {
+    public static final String STANDARD_DSK_PREFIX = "MV - CPC";
+    public static final String EXTENDED_DSK_PREFIX = "EXTENDED";
     private String magic;
     private String creator;
     private int trackCount;

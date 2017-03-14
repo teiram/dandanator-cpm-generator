@@ -6,6 +6,9 @@ import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -112,6 +115,19 @@ public class DskUtil {
                     .withSectorsByTrack(spec.getSectorsByTrack())
                     .withTrackCount(spec.getTracksBySide() * spec.getSides())
                     .build();
+        }
+    }
+
+    public static boolean isDskFile(File dskFile) {
+        try (FileInputStream fis = new FileInputStream(dskFile)) {
+            DiskInformationBlock diskInformationBlock =
+                DiskInformationBlock.fromInputStream(fis);
+            String magic = diskInformationBlock.getMagic();
+            return  magic.startsWith(DiskInformationBlock.STANDARD_DSK_PREFIX) ||
+                    magic.startsWith(DiskInformationBlock.EXTENDED_DSK_PREFIX);
+        } catch (Exception e) {
+            LOGGER.error("Checking DSK file", e);
+            return false;
         }
     }
 }

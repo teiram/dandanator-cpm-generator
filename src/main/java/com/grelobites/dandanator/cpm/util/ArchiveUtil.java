@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,14 +75,20 @@ public class ArchiveUtil {
         return candidate;
     }
 
+    public static boolean isFileValidRomSet(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] header = Util.fromInputStream(fis, Constants.ROMSET_HEADER_SIZE);
+            return Arrays.equals(header, Constants.ROMSET_HEADER);
+        }
+    }
 
     public static FileType guessFileType(File file) {
         //TODO: Implement properly for DSK and ROMSET detection
         if (file.getName().endsWith(".raw")) {
             return FileType.RAWFS;
-        } else if (file.getName().endsWith(".dsk")) {
+        } else if (file.getName().endsWith(".dsk") && DskUtil.isDskFile(file)) {
             return FileType.DSK;
-        } else if (file.getName().endsWith(".rom") && file.length() == 16386 * 32) {
+        } else if (file.getName().endsWith(".rom") && file.length() == Constants.ROMSET_SIZE) {
             return FileType.ROMSET;
         } else {
             return FileType.ARCHIVE;
