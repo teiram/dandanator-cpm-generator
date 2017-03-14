@@ -68,12 +68,10 @@ public class Constants {
 
 
     private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
-    private static final String DEFAULT_EMS_BINARY_RESOURCE = "S10CPM3.EMS";
     private static final String THEME_RESOURCE = "view/theme.css";
 
 
     private static byte[] DEFAULT_BOOT_IMAGE;
-    private static byte[] DEFAULT_EMS_BINARY;
 
     private static String THEME_RESOURCE_URL;
 
@@ -95,16 +93,6 @@ public class Constants {
         }
         return DEFAULT_BOOT_IMAGE;
     }
-
-    public static byte[] getDefaultEmsBinary() throws IOException {
-        if (DEFAULT_EMS_BINARY == null) {
-            DEFAULT_EMS_BINARY = Util.fromInputStream(
-                    Constants.class.getClassLoader()
-                            .getResourceAsStream(DEFAULT_EMS_BINARY_RESOURCE));
-        }
-        return DEFAULT_EMS_BINARY;
-    }
-
 
     public static String getThemeResourceUrl() {
         if (THEME_RESOURCE_URL == null) {
