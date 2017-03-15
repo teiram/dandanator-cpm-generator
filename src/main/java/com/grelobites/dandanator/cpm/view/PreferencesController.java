@@ -69,8 +69,16 @@ public class PreferencesController {
         }
     }
 
+    private boolean isEmsBinaryPathValid(File emsFile) {
+        try {
+            return isReadableFile(emsFile) && emsFile.length() <= Constants.MAX_EMS_FILE_SIZE;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private void updateEmsBinaryPath(File emsFile) throws IOException {
-        if (isReadableFile(emsFile) && emsFile.length() <= Constants.MAX_EMS_FILE_SIZE) {
+        if (isEmsBinaryPathValid(emsFile)) {
             Preferences.getInstance().setEmsBinaryPath(emsFile.getAbsolutePath());
         } else {
             throw new IllegalArgumentException("No valid EMS file provided");
@@ -133,7 +141,18 @@ public class PreferencesController {
     }
 
     private void emsBinarySetup() {
-        Preferences configuration = Preferences.getInstance();
+        Preferences preferences = Preferences.getInstance();
+
+        if (preferences.getEmsBinaryPath() != null &&
+                !isEmsBinaryPathValid(new File(preferences.getEmsBinaryPath()))) {
+            DialogUtil.buildErrorAlert(LocaleUtil.i18n("preferencesError"),
+                    LocaleUtil.i18n("emsFileProblem"),
+                    String.format(LocaleUtil.i18n("emsFileNoLongerAvailable"),
+                            preferences.getEmsBinaryPath()))
+                    .showAndWait();
+            preferences.setEmsBinaryPath(null);
+        }
+
         changeEmsBinaryPathButton.setOnAction(event -> {
             FileChooser chooser = new FileChooser();
             chooser.setTitle(LocaleUtil.i18n("selectEmsMessage"));
@@ -149,13 +168,13 @@ public class PreferencesController {
         });
         resetEmsBinaryPathButton.setOnAction(event -> {
             try {
-                configuration.setEmsBinaryPath(null);
+                preferences.setEmsBinaryPath(null);
             } catch (Exception e) {
                 LOGGER.error("Resetting EMS Path", e);
             }
         });
+
         emsBinaryPath.textProperty().bind(Bindings.createStringBinding(() -> {
-            Preferences preferences = Preferences.getInstance();
             if (preferences.getEmsBinaryPath() == null) {
                 return LocaleUtil.i18n("notDefinedValue");
             } else {
