@@ -23,10 +23,13 @@ public class Constants {
 	public static final String EMPTY_STRING = "";
 	public static final String NO_VALUE = "-";
 	public static final String TEXT_ERROR_STYLE = "red-text";
+	public static final String GREEN_BACKGROUND_STYLE = "green-background";
+	public static final String NORMAL_BACKGROUND_STYLE = "normal-background";
+
 
     public static final FileSystemParameters ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
-                    .withBlockCount(240)
+                    .withBlockCount(232)
                     .withBlockSize(2048)
                     .withDirectoryEntries(128)
                     .withSectorsByTrack(9)

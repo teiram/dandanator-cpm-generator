@@ -264,9 +264,18 @@ public class MainAppController {
             event.consume();
         });
 
-        archiveTable.setOnDragEntered(Event::consume);
+        archiveTable.setOnDragEntered(event -> {
+            if (event.getGestureSource() == null &&
+                    event.getDragboard().hasFiles()) {
+                archiveTable.getStyleClass().add(Constants.GREEN_BACKGROUND_STYLE);
+            }
+            event.consume();
+        });
 
-        archiveTable.setOnDragExited(Event::consume);
+        archiveTable.setOnDragExited(event -> {
+            archiveTable.getStyleClass().remove(Constants.GREEN_BACKGROUND_STYLE);
+            event.consume();
+        });
 
         archiveTable.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
