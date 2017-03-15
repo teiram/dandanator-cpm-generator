@@ -73,7 +73,7 @@
                 <configuration>
                     <vendor>Grelobites</vendor>
                     <mainClass>${mainClass}</mainClass>
-                    <appName>Dandanator CP/M ROM Generator</appName>
+                    <appName>Dandanator CPM ROM Generator</appName>
                     <bundleArguments>
                         <runtime />
                     </bundleArguments>
