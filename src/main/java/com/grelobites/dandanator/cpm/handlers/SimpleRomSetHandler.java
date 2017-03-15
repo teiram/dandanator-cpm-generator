@@ -8,6 +8,7 @@ import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.util.Util;
+import com.sun.tools.internal.jxc.ap.Const;
 import javafx.beans.InvalidationListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,12 +97,20 @@ public class SimpleRomSetHandler implements RomSetHandler {
         buffer.putShort(Integer.valueOf(offset).shortValue());
         buffer.putShort(Integer.valueOf(screen.length).shortValue());
 
+        offset += screen.length;
+
+        byte[] kloaderScreen = Util.fromInputStream(SimpleRomSetHandler.class
+            .getResourceAsStream("/loader-screen.scr.zx7"));
+        buffer.putShort(Integer.valueOf(offset).shortValue());
+
         romset.write(buffer.array());
         romset.write(driver);
         romset.write(screen);
+        romset.write(kloaderScreen);
 
-        offset += screen.length;
+        offset += kloaderScreen.length;
 
+        LOGGER.debug("Padding with " + (Constants.SLOT_SIZE - offset) + " zeros to fill first slot from " + offset);
         fillWithValue(romset, (byte) 0, Constants.SLOT_SIZE - offset);
 
         //Write EMS on second slot
@@ -113,7 +122,9 @@ public class SimpleRomSetHandler implements RomSetHandler {
 
         fillWithValue(romset, (byte) 0, (Constants.SLOT_SIZE * 3) - offset);
 
-        romset.write(fileSystem.asByteArray());
+        byte[] fsByteArray = fileSystem.asByteArray();
+        LOGGER.debug("Filesystem size is " + fsByteArray.length);
+        romset.write(fsByteArray);
         romset.flush();
     }
 
