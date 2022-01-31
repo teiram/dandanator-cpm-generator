@@ -1,5 +1,6 @@
 package com.grelobites.dandanator.cpm;
 
+import com.grelobites.dandanator.cpm.handlers.CpcCpmRomSetHandler;
 import com.grelobites.dandanator.cpm.handlers.SimpleRomSetHandler;
 import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
@@ -61,7 +62,7 @@ public class ApplicationContext {
 
     public ApplicationContext() {
         this.archiveList = FXCollections.observableArrayList(Archive::getObservables);
-        this.romSetHandler = new SimpleRomSetHandler(this);
+        this.romSetHandler = new CpcCpmRomSetHandler(this);
         this.archiveSelected = new SimpleBooleanProperty(false);
         this.romUsage = new SimpleDoubleProperty(0);
         this.romUsageDetail = new SimpleStringProperty();

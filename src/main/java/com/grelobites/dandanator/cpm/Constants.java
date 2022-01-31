@@ -33,8 +33,26 @@ public class Constants {
                     .withBlockSize(2048)
                     .withDirectoryEntries(128)
                     .withSectorsByTrack(9)
-                    .withTrackCount(80)
+                    .withTrackCount(96)
                     .withSectorSize(512)
+                    .withReservedTracks(2)
+                    .build();
+    // 9 * 512 = 4608 bytes per track
+    // 4096 as scratch buffer (slot 0?)
+    // Write procedure:
+    // - Erase the scratch buffer
+    // - Load sector by sector of 512 bytes using the source, except the one to write (7 sectors) - They could be on different sector
+    // - Load the sector to be modified 475.136
+
+    public static final FileSystemParameters CPC_ROMSET_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(233)
+                    .withBlockSize(2048)
+                    .withDirectoryEntries(128)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(99)
+                    .withSectorSize(512)
+                    .withReservedTracks(2)
                     .build();
 
     public static final FileSystemParameters PLUS3_FS_PARAMETERS =
