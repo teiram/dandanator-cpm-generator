@@ -126,12 +126,17 @@ public class CpcCpmRomSetHandler implements RomSetHandler {
                 (1024 + compressedEewriterCode.length + compressedEewriterScreen.length));
 
         romset.write(patchedAmsdos);
-        romset.write(Util.fromInputStream(CpcCpmRomSetHandler.class
-                .getResourceAsStream("/cpc/system-tracks.bin")));
+
+        byte[] systemTracks = Util.fromInputStream(CpcCpmRomSetHandler.class
+                        .getResourceAsStream("/cpc/system-tracks.bin"));
+
+        romset.write(systemTracks);
 
         byte[] fsByteArray = fileSystem.asByteArray();
         LOGGER.debug("Filesystem size is " + fsByteArray.length);
         romset.write(fsByteArray);
+        fillWithValue(romset, Integer.valueOf(0).byteValue(),
+                Constants.SLOT_SIZE * 30 - (systemTracks.length + fsByteArray.length));
         romset.flush();
 
     }
