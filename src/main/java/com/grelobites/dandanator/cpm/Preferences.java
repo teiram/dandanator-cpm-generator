@@ -1,7 +1,10 @@
 package com.grelobites.dandanator.cpm;
 
+import com.grelobites.dandanator.cpm.model.HandlerType;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
@@ -15,30 +18,24 @@ public class Preferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     private static final String BOOTIMAGEPATH_PROPERTY = "bootImagePath";
-    private static final String EMSBINARYPATH_PROPERTY = "emsBinaryPath";
+    private static final String HANDLERTYPE_PROPERTY = "handlerType";
     byte[] bootImage;
-    byte[] emsBinary;
 
-    private StringProperty bootImagePath;
-    private StringProperty emsBinaryPath;
+    final private StringProperty bootImagePath;
 
-    private BooleanProperty validPreferences;
+    final private BooleanProperty validPreferences;
+    final private ObjectProperty<HandlerType> handlerType;
 
     private static Preferences INSTANCE;
 
     private Preferences() {
         this.bootImagePath = new SimpleStringProperty();
-        this.emsBinaryPath = new SimpleStringProperty();
-        this.validPreferences = new SimpleBooleanProperty(false);
-        this.validPreferences.bind(emsBinaryPath.isNotEmpty());
-
-        this.bootImagePath.addListener((observable, oldValue, newValue) -> {
-            persistConfigurationValue(BOOTIMAGEPATH_PROPERTY, newValue);
-
-        });
-        this.emsBinaryPath.addListener((observable, oldValue, newValue) -> {
-            persistConfigurationValue(EMSBINARYPATH_PROPERTY, newValue);
-        });
+        this.validPreferences = new SimpleBooleanProperty(true);
+        this.handlerType = new SimpleObjectProperty<>(HandlerType.SPECTRUM);
+        this.bootImagePath.addListener((observable, oldValue, newValue) ->
+                persistConfigurationValue(BOOTIMAGEPATH_PROPERTY, newValue));
+        this.handlerType.addListener((observable, oldValue, newValue) ->
+            persistConfigurationValue(HANDLERTYPE_PROPERTY, newValue.name()));
     }
 
     public static Preferences getInstance() {
@@ -67,17 +64,6 @@ public class Preferences {
         this.bootImage = bootImage;
     }
 
-    public byte[] getEmsBinary() throws IOException {
-        if (emsBinary == null) {
-            emsBinary = Files.readAllBytes(Paths.get(getEmsBinaryPath()));
-        }
-        return emsBinary;
-    }
-
-    public void setEmsBinary(byte[] emsBinary) {
-        this.emsBinary = emsBinary;
-    }
-
     public String getBootImagePath() {
         return bootImagePath.get();
     }
@@ -91,16 +77,16 @@ public class Preferences {
         bootImage = null;
     }
 
-    public String getEmsBinaryPath() {
-        return emsBinaryPath.get();
+    public HandlerType getHandlerType() {
+        return handlerType.get();
     }
 
-    public StringProperty emsBinaryPathProperty() {
-        return emsBinaryPath;
+    public ObjectProperty<HandlerType> handlerTypeProperty() {
+        return handlerType;
     }
 
-    public void setEmsBinaryPath(String emsBinaryPath) {
-        this.emsBinaryPath.set(emsBinaryPath);
+    public void setHandlerType(HandlerType handlerType) {
+        this.handlerType.set(handlerType);
     }
 
     public boolean isValidPreferences() {
@@ -118,7 +104,7 @@ public class Preferences {
     private static Preferences setFromPreferences(Preferences preferences) {
         java.util.prefs.Preferences p = getApplicationPreferences();
         preferences.setBootImagePath(p.get(BOOTIMAGEPATH_PROPERTY, null));
-        preferences.setEmsBinaryPath(p.get(EMSBINARYPATH_PROPERTY, null));
+        preferences.setHandlerType(HandlerType.valueOf(p.get(HANDLERTYPE_PROPERTY, HandlerType.SPECTRUM.name())));
         return preferences;
     }
 

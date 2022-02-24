@@ -19,6 +19,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
@@ -114,6 +116,9 @@ public class MainAppController {
 
     @FXML
     private ProgressBar diskResources;
+
+    @FXML
+    private ImageView icon;
 
     private UserAreaPicker filterUserAreaPicker;
     private ArchiveView archiveView;
@@ -348,6 +353,10 @@ public class MainAppController {
         Tooltip diskResourcesDetail = new Tooltip();
         diskResources.setTooltip(diskResourcesDetail);
         diskResourcesDetail.textProperty().bind(applicationContext.romUsageDetailProperty());
+        icon.setImage(Preferences.getInstance().getHandlerType().icon());
+        Preferences.getInstance().handlerTypeProperty().addListener((e, oldValue, newValue) -> {
+            icon.setImage(newValue.icon());
+        });
     }
 
     private void onArchiveSelection(Archive oldArchive, Archive newArchive) {

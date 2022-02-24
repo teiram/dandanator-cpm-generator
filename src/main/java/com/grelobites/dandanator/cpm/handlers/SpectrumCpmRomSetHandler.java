@@ -18,8 +18,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class SimpleRomSetHandler implements RomSetHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRomSetHandler.class);
+public class SpectrumCpmRomSetHandler implements RomSetHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpectrumCpmRomSetHandler.class);
 
     private ApplicationContext applicationContext;
 
@@ -27,9 +27,19 @@ public class SimpleRomSetHandler implements RomSetHandler {
 
     private InvalidationListener romUsageUpdater = e -> updateRomUsage();
 
-    public SimpleRomSetHandler(ApplicationContext context) {
+    public SpectrumCpmRomSetHandler(ApplicationContext context) {
         this.applicationContext = context;
         this.fileSystem = new CpmFileSystem(Constants.ROMSET_FS_PARAMETERS);
+    }
+
+    public void unbind() {
+        applicationContext.getArchiveList().removeListener(romUsageUpdater);
+    }
+
+    public void bind() {
+        fileSystem.clear();
+        applicationContext.getArchiveList().forEach(fileSystem::addArchive);
+        updateRomUsage();
         applicationContext.getArchiveList().addListener(romUsageUpdater);
     }
 
@@ -76,7 +86,7 @@ public class SimpleRomSetHandler implements RomSetHandler {
     @Override
     public void exportRomSet(OutputStream romset) throws IOException {
         LOGGER.debug("exportRomSet " + romset);
-        ByteBuffer buffer = ByteBuffer.wrap(Util.fromInputStream(SimpleRomSetHandler.class
+        ByteBuffer buffer = ByteBuffer.wrap(Util.fromInputStream(SpectrumCpmRomSetHandler.class
                 .getResourceAsStream("/loader.bin")));
         buffer.order(ByteOrder.LITTLE_ENDIAN).position(4);
         buffer.putShort(Integer.valueOf(1).shortValue()); //TODO: Set proper version here
@@ -84,7 +94,7 @@ public class SimpleRomSetHandler implements RomSetHandler {
         int offset = buffer.array().length;
         LOGGER.debug("Writing driver at offset " + offset);
 
-        byte[] driver = Util.fromInputStream(SimpleRomSetHandler.class
+        byte[] driver = Util.fromInputStream(SpectrumCpmRomSetHandler.class
             .getResourceAsStream("/dandanator_fid_driver.bin"));
         buffer.putShort(Integer.valueOf(offset).shortValue());
         buffer.putShort(Integer.valueOf(driver.length).shortValue());
@@ -98,7 +108,7 @@ public class SimpleRomSetHandler implements RomSetHandler {
 
         offset += screen.length;
 
-        byte[] kloaderScreen = Util.fromInputStream(SimpleRomSetHandler.class
+        byte[] kloaderScreen = Util.fromInputStream(SpectrumCpmRomSetHandler.class
             .getResourceAsStream("/loader-screen.scr.zx7"));
         buffer.putShort(Integer.valueOf(offset).shortValue());
 
@@ -115,7 +125,7 @@ public class SimpleRomSetHandler implements RomSetHandler {
         //Write EMS on second slot
         offset = Constants.SLOT_SIZE;
 
-        byte[] emsFile = Preferences.getInstance().getEmsBinary();
+        byte[] emsFile = Constants.getEmsFileByteStream();
         romset.write(emsFile);
         offset += emsFile.length;
 

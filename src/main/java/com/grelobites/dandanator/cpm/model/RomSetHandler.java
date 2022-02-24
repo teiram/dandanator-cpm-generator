@@ -14,6 +14,10 @@ public interface RomSetHandler {
 
     void clear();
 
+    void bind();
+
+    void unbind();
+
     void removeArchive(Archive archive);
 
     void addArchive(Archive archive);

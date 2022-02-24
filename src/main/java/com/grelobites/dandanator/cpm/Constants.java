@@ -2,11 +2,13 @@ package com.grelobites.dandanator.cpm;
 
 import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import com.grelobites.dandanator.cpm.util.Util;
+import com.grelobites.dandanator.cpm.view.MainAppController;
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 
 public class Constants {
-    private static final String DEFAULT_VERSION = "1.0";
+    private static final String DEFAULT_VERSION = "2.0";
 
     public static final int SLOT_SIZE = 0x4000;
     public static final int MAX_EMS_FILE_SIZE = 0x4000 * 2;
@@ -25,6 +27,10 @@ public class Constants {
 	public static final String TEXT_ERROR_STYLE = "red-text";
 	public static final String GREEN_BACKGROUND_STYLE = "green-background";
 	public static final String NORMAL_BACKGROUND_STYLE = "normal-background";
+
+    public static final Image SPECTRUM_ICON = new Image(Constants.class.getResourceAsStream("/color-logo.png"));
+    public static final Image CPC_ICON = new Image(Constants.class.getResourceAsStream("/color-logo-cpc.png"));
+
 
 
     public static final FileSystemParameters ROMSET_FS_PARAMETERS =
@@ -90,13 +96,14 @@ public class Constants {
 
 
     private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
+    private static final String EMS_FILE_RESOURCE = "S10CPM3.EMS";
     private static final String THEME_RESOURCE = "view/theme.css";
     public static final int ROMSET_HEADER_SIZE = 4;
     public static final byte[] ROMSET_HEADER = new byte[] {(byte) 0xF3, (byte) 0xC3, (byte) 0x00, (byte) 0x01};
 
 
     private static byte[] DEFAULT_BOOT_IMAGE;
-
+    private static byte[] EMS_FILE;
     private static String THEME_RESOURCE_URL;
     public static final long ROMSET_SIZE = SLOT_SIZE * 32;
 
@@ -118,6 +125,15 @@ public class Constants {
                     Constants.SPECTRUM_FULLSCREEN_SIZE);
         }
         return DEFAULT_BOOT_IMAGE;
+    }
+
+    public static byte[] getEmsFileByteStream() throws IOException {
+        if (EMS_FILE == null) {
+            EMS_FILE = Util.fromInputStream(
+                    Constants.class.getClassLoader()
+                            .getResourceAsStream(EMS_FILE_RESOURCE));
+        }
+        return EMS_FILE;
     }
 
     public static String getThemeResourceUrl() {

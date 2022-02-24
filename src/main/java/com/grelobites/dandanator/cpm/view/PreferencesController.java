@@ -2,12 +2,15 @@ package com.grelobites.dandanator.cpm.view;
 
 import com.grelobites.dandanator.cpm.Constants;
 import com.grelobites.dandanator.cpm.Preferences;
+import com.grelobites.dandanator.cpm.model.HandlerType;
 import com.grelobites.dandanator.cpm.util.ImageUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -18,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PreferencesController {
 
@@ -38,14 +43,7 @@ public class PreferencesController {
     private Button resetBootImageButton;
 
     @FXML
-    private Button changeEmsBinaryPathButton;
-
-    @FXML
-    private Label emsBinaryPath;
-
-    @FXML
-    private Button resetEmsBinaryPathButton;
-
+    private ChoiceBox<HandlerType> handlerTypeChoiceBox;
 
     private void initializeImages() throws IOException {
         bootImage = ImageUtil.scrLoader(
@@ -66,22 +64,6 @@ public class PreferencesController {
             recreateBootImage();
         } else {
             throw new IllegalArgumentException("No valid boot image file provided");
-        }
-    }
-
-    private boolean isEmsBinaryPathValid(File emsFile) {
-        try {
-            return isReadableFile(emsFile) && emsFile.length() <= Constants.MAX_EMS_FILE_SIZE;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void updateEmsBinaryPath(File emsFile) throws IOException {
-        if (isEmsBinaryPathValid(emsFile)) {
-            Preferences.getInstance().setEmsBinaryPath(emsFile.getAbsolutePath());
-        } else {
-            throw new IllegalArgumentException("No valid EMS file provided");
         }
     }
 
@@ -140,57 +122,19 @@ public class PreferencesController {
                 });
     }
 
-    private void emsBinarySetup() {
-        Preferences preferences = Preferences.getInstance();
-
-        if (preferences.getEmsBinaryPath() != null &&
-                !isEmsBinaryPathValid(new File(preferences.getEmsBinaryPath()))) {
-            DialogUtil.buildErrorAlert(LocaleUtil.i18n("preferencesError"),
-                    LocaleUtil.i18n("emsFileProblem"),
-                    String.format(LocaleUtil.i18n("emsFileNoLongerAvailable"),
-                            preferences.getEmsBinaryPath()))
-                    .showAndWait();
-            preferences.setEmsBinaryPath(null);
-        }
-
-        changeEmsBinaryPathButton.setOnAction(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle(LocaleUtil.i18n("selectEmsMessage"));
-            final File emsFile = chooser.showOpenDialog(changeEmsBinaryPathButton.getScene().getWindow());
-            if (emsFile != null) {
-                try {
-                    updateEmsBinaryPath(emsFile);
-                } catch (Exception e) {
-                    LOGGER.error("Updating EMS from " + emsFile, e);
-                    showGenericFileErrorAlert();
-                }
-            }
-        });
-        resetEmsBinaryPathButton.setOnAction(event -> {
-            try {
-                preferences.setEmsBinaryPath(null);
-            } catch (Exception e) {
-                LOGGER.error("Resetting EMS Path", e);
-            }
-        });
-
-        emsBinaryPath.textProperty().bind(Bindings.createStringBinding(() -> {
-            if (preferences.getEmsBinaryPath() == null) {
-                return LocaleUtil.i18n("notDefinedValue");
-            } else {
-                return preferences.getEmsBinaryPath();
-            }
-        }, Preferences.getInstance().emsBinaryPathProperty()));
-
-    }
-
     @FXML
     private void initialize() throws IOException {
         initializeImages();
 
         backgroundImageSetup();
 
-        emsBinarySetup();
+        handlerTypeChoiceBox.setItems(FXCollections.observableArrayList(
+                Stream.of(HandlerType.values()).collect(Collectors.toList())
+        ));
+
+        handlerTypeChoiceBox.getSelectionModel().select(Preferences.getInstance().getHandlerType());
+        handlerTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((e, oldValue, newValue) ->
+                Preferences.getInstance().setHandlerType(newValue));
 
     }
 }

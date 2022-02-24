@@ -30,6 +30,16 @@ public class CpcCpmRomSetHandler implements RomSetHandler {
     public CpcCpmRomSetHandler(ApplicationContext context) {
         this.applicationContext = context;
         this.fileSystem = new CpmFileSystem(Constants.CPC_ROMSET_FS_PARAMETERS);
+    }
+
+    public void unbind() {
+        applicationContext.getArchiveList().removeListener(romUsageUpdater);
+    }
+
+    public void bind() {
+        fileSystem.clear();
+        applicationContext.getArchiveList().forEach(fileSystem::addArchive);
+        updateRomUsage();
         applicationContext.getArchiveList().addListener(romUsageUpdater);
     }
 
