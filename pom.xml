@@ -17,7 +17,15 @@
         <url>scm:git:git@github.com:teiram/dandanator-cpm-generator.git</url>
         <developerConnection>scm:git:git@github.com:teiram/dandanator-cpm-generator.git</developerConnection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/teiram/dandanator-cpm-generator</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<resources>
