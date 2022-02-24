@@ -13,8 +13,6 @@ import javafx.scene.control.TextFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.UnaryOperator;
-
 public class ArchiveView {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveView.class);
     private ApplicationContext applicationContext;
@@ -28,15 +26,8 @@ public class ArchiveView {
 
     private Archive currentArchive;
 
-    private ChangeListener<Boolean> readOnlyAttributeChangeListener = (observable, oldValue, newValue) ->
-            updateAttribute(ArchiveFlags.READ_ONLY, newValue);
-    private ChangeListener<Boolean> systemAttributeChangeListener = (observable, oldValue, newValue) ->
-            updateAttribute(ArchiveFlags.SYSTEM, newValue);
-    private ChangeListener<Boolean> archivedAttributeChangeListener = (observable, oldValue, newValue) ->
-            updateAttribute(ArchiveFlags.ARCHIVED, newValue);
-
     private TextFormatter<String> getCpmTextFormatter(final int maxLength) {
-        return new TextFormatter<>((UnaryOperator<TextFormatter.Change>)  c -> {
+        return new TextFormatter<>(c -> {
             if (c.isContentChange()) {
                 LOGGER.debug("Change was " + c);
                 String filteredName = ArchiveUtil.toCpmValidName(c.getControlNewText(),
@@ -64,44 +55,6 @@ public class ArchiveView {
                 a.getExtension().equals(extension)).size() > 0;
     }
 
-    private ChangeListener<String> nameChangeListener = (observable, oldValue, newValue) -> {
-        if (currentArchive != null) {
-            if (isNameAlreadyInUse(currentArchive.getId(), newValue, currentArchive.getExtension(),
-                        currentArchive.getUserArea())) {
-                name.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
-            } else {
-                name.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
-                currentArchive.setName(newValue);
-            }
-        }
-    };
-
-    private ChangeListener<String> extensionChangeListener = (observable, oldValue, newValue) -> {
-        if (currentArchive != null) {
-            if (isNameAlreadyInUse(currentArchive.getId(), currentArchive.getName(),
-                    newValue, currentArchive.getUserArea())) {
-                extension.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
-            } else {
-                extension.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
-                currentArchive.setExtension(newValue);
-            }
-        }
-    };
-
-    private ChangeListener<Integer> userAreaChangeListener = (observable, oldValue, newValue) -> {
-        if (currentArchive != null) {
-            if (isNameAlreadyInUse(currentArchive.getId(), currentArchive.getName(),
-                    currentArchive.getExtension(), newValue)) {
-                userArea.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
-            } else {
-                userArea.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
-                currentArchive.setUserArea(newValue);
-            }
-        }
-    };
-
-
-
     public ArchiveView(ApplicationContext applicationContext,
                        TextField name, TextField extension, Label size,
                        UserAreaPicker userArea, CheckBox readOnlyAttribute,
@@ -115,11 +68,50 @@ public class ArchiveView {
         this.systemAttribute = systemAttribute;
         this.archivedAttribute = archivedAttribute;
 
+        ChangeListener<String> nameChangeListener = (observable, oldValue, newValue) -> {
+            if (currentArchive != null) {
+                if (isNameAlreadyInUse(currentArchive.getId(), newValue, currentArchive.getExtension(),
+                        currentArchive.getUserArea())) {
+                    name.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
+                } else {
+                    name.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
+                    currentArchive.setName(newValue);
+                }
+            }
+        };
         this.name.textProperty().addListener(nameChangeListener);
+        ChangeListener<String> extensionChangeListener = (observable, oldValue, newValue) -> {
+            if (currentArchive != null) {
+                if (isNameAlreadyInUse(currentArchive.getId(), currentArchive.getName(),
+                        newValue, currentArchive.getUserArea())) {
+                    extension.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
+                } else {
+                    extension.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
+                    currentArchive.setExtension(newValue);
+                }
+            }
+        };
         this.extension.textProperty().addListener(extensionChangeListener);
-        this.userArea.userAreaProperty().addListener((ChangeListener) userAreaChangeListener);
+        ChangeListener<Number> userAreaChangeListener = (observable, oldValue, newValue) -> {
+            if (currentArchive != null) {
+                if (isNameAlreadyInUse(currentArchive.getId(), currentArchive.getName(),
+                        currentArchive.getExtension(), newValue.intValue())) {
+                    userArea.getStyleClass().add(Constants.TEXT_ERROR_STYLE);
+                } else {
+                    userArea.getStyleClass().removeAll(Constants.TEXT_ERROR_STYLE);
+                    currentArchive.setUserArea(newValue.intValue());
+                }
+            }
+        };
+        this.userArea.userAreaProperty().addListener(userAreaChangeListener);
+        ChangeListener<Boolean> readOnlyAttributeChangeListener = (observable, oldValue, newValue) ->
+                updateAttribute(ArchiveFlags.READ_ONLY, newValue);
         this.readOnlyAttribute.selectedProperty().addListener(readOnlyAttributeChangeListener);
+        ChangeListener<Boolean> systemAttributeChangeListener = (observable, oldValue, newValue) ->
+                updateAttribute(ArchiveFlags.SYSTEM, newValue);
         this.systemAttribute.selectedProperty().addListener(systemAttributeChangeListener);
+        ChangeListener<Boolean> archivedAttributeChangeListener = (observable, oldValue, newValue) ->
+                updateAttribute(ArchiveFlags.ARCHIVED, newValue);
         this.archivedAttribute.selectedProperty().addListener(archivedAttributeChangeListener);
 
         this.name.setTextFormatter(getCpmTextFormatter(Constants.CPM_FILENAME_MAXLENGTH));

@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class TrackInformationBlock {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackInformationBlock.class);
-    private static final byte[] TRACK_HEADER = new String("Track-Info\r\n").getBytes();
+    private static final byte[] TRACK_HEADER = "Track-Info\r\n".getBytes();
 
     private int trackNumber;
     private int sideNumber;

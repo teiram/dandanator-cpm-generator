@@ -66,8 +66,8 @@ public class Zx7OutputStream extends FilterOutputStream {
     private static Optimal[] optimize(byte[] data) {
         int inputSize = data.length;
 
-        int min[] = new int[MAX_OFFSET + 1];
-        int max[] = new int[MAX_OFFSET + 1];
+        int[] min = new int[MAX_OFFSET + 1];
+        int[] max = new int[MAX_OFFSET + 1];
         Optimal[] optimals = new Optimal[inputSize];
         Match[] matches = new Match[256 * 256];
         Match[] matchSlots = new Match[inputSize];
@@ -129,7 +129,7 @@ public class Zx7OutputStream extends FilterOutputStream {
     }
 
 
-    private byte[] compress(Optimal[] optimals, byte[] data) throws IOException {
+    private byte[] compress(Optimal[] optimals, byte[] data) {
         int inputSize = data.length;
         int inputIndex = inputSize - 1;
         int outputSize = (optimals[inputIndex].bits + 18 + 7) / 8;

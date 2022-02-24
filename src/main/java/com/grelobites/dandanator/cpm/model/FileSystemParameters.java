@@ -62,13 +62,7 @@ public class FileSystemParameters {
                 LOGGER.error("Invalid blockSize/blockCount  combination: " + parameters);
                 throw new IllegalArgumentException("Invalid blockSize/blockCount combination");
             }
-            /*
-            if (parameters.getBlockSize() * parameters.getBlockCount() <
-                    parameters.getTrackCount() * parameters.getSectorsByTrack() * parameters.getSectorSize()) {
-                LOGGER.error("Not enough tracks to hold the block count " + parameters);
-                throw new IllegalArgumentException("Invalid trackCount/blockCount combination");
-            }
-            */
+
             return parameters;
         }
     }

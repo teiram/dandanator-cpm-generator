@@ -2,10 +2,10 @@ package com.grelobites.dandanator.cpm;
 
 import com.grelobites.dandanator.cpm.model.FileSystemParameters;
 import com.grelobites.dandanator.cpm.util.Util;
-import com.grelobites.dandanator.cpm.view.MainAppController;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Constants {
     private static final String DEFAULT_VERSION = "2.0";
@@ -130,8 +130,8 @@ public class Constants {
     public static byte[] getEmsFileByteStream() throws IOException {
         if (EMS_FILE == null) {
             EMS_FILE = Util.fromInputStream(
-                    Constants.class.getClassLoader()
-                            .getResourceAsStream(EMS_FILE_RESOURCE));
+                    Objects.requireNonNull(Constants.class.getClassLoader()
+                            .getResourceAsStream(EMS_FILE_RESOURCE)));
         }
         return EMS_FILE;
     }

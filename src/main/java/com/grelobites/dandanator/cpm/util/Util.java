@@ -1,6 +1,5 @@
 package com.grelobites.dandanator.cpm.util;
 
-import com.grelobites.dandanator.cpm.model.Archive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -156,11 +153,6 @@ public class Util {
         return (n == 0 ? "" : String.format("%"+n+"s", " "));
     }
 
-    public static <S, T> Collection<T> collectionUpcast(Collection<S> list) {
-        return list.stream().map(item -> (T) item)
-            .collect(Collectors.toList());
-    }
-
     public static String dumpAsHexString(byte[] byteArray) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -179,7 +171,7 @@ public class Util {
         }
     }
 
-    public static int getBlockCrc16(byte data[], int blockSize) {
+    public static int getBlockCrc16(byte[] data, int blockSize) {
         int sum = 0;
         for (int i = 0; i < blockSize; i++) {
             sum += Byte.toUnsignedInt(data[i]);

@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CpmDirectoryEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(CpmDirectoryEntry.class);
-    private EnumSet<ArchiveFlags> flags = EnumSet.noneOf(ArchiveFlags.class);
+    private EnumSet<ArchiveFlags> flags;
     private String name;
     private String extension;
     private int userArea;
@@ -96,8 +96,8 @@ public class CpmDirectoryEntry {
         byte[] extensionByteArray = new byte[CpmConstants.FILEEXTENSION_MAXLENGTH];
         int byteCount = 0;
         int recordCount = 0;
-        int extentLow = 0;
-        int extentHigh = 0;
+        int extentLow;
+        int extentHigh;
         int extent = 0;
         EnumSet<ArchiveFlags> flags = EnumSet.noneOf(ArchiveFlags.class);
         boolean bigDisk = parameters.getBlockCount() > 255;
@@ -154,11 +154,11 @@ public class CpmDirectoryEntry {
                 .put(Integer.valueOf(byteCount).byteValue())
                 .put(Integer.valueOf((extent & 0x03E0) >> 5).byteValue())
                 .put(Integer.valueOf(recordCount).byteValue());
-        for (int i = 0; i < allocatedBlocks.length; i++) {
+        for (int allocatedBlock : allocatedBlocks) {
             if (bigDisk) {
-                buffer.putShort(Integer.valueOf(allocatedBlocks[i]).shortValue());
+                buffer.putShort(Integer.valueOf(allocatedBlock).shortValue());
             } else {
-                buffer.put(Integer.valueOf(allocatedBlocks[i]).byteValue());
+                buffer.put(Integer.valueOf(allocatedBlock).byteValue());
             }
         }
         return buffer.array();

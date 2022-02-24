@@ -242,7 +242,7 @@ public class ApplicationContext {
         }
     }
 
-    class BackgroundTask implements Callable<OperationResult> {
+    static class BackgroundTask implements Callable<OperationResult> {
         private IntegerProperty backgroundTaskCount;
         private Callable<OperationResult> task;
 

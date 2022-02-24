@@ -101,6 +101,12 @@ public class Preferences {
         return java.util.prefs.Preferences.userNodeForPackage(Preferences.class);
     }
 
+    public String getDefaultExportFilename() {
+        return String.format("dandanator_%s_cpm_%s.rom",
+                getHandlerType().name().toLowerCase(),
+                Constants.currentVersion());
+    }
+
     private static Preferences setFromPreferences(Preferences preferences) {
         java.util.prefs.Preferences p = getApplicationPreferences();
         preferences.setBootImagePath(p.get(BOOTIMAGEPATH_PROPERTY, null));

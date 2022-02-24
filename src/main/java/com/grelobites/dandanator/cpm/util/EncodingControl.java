@@ -1,5 +1,8 @@
 package com.grelobites.dandanator.cpm.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,6 +17,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 public class EncodingControl extends Control {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EncodingControl.class);
 
     private String encoding;
 
@@ -28,43 +32,42 @@ public class EncodingControl extends Control {
         ResourceBundle bundle = null;
         if (format.equals("java.class")) {
             try {
-                Class<? extends ResourceBundle> bundleClass = (Class<? extends ResourceBundle>) loader.loadClass(bundleName);
+                Class<?> bundleClass = loader.loadClass(bundleName);
 
                 // If the class isn't a ResourceBundle subclass, throw a
                 // ClassCastException.
                 if (ResourceBundle.class.isAssignableFrom(bundleClass)) {
-                    bundle = bundleClass.newInstance();
+                    bundle = bundleClass.asSubclass(ResourceBundle.class).newInstance();
                 } else {
                     throw new ClassCastException(bundleClass.getName() + " cannot be cast to ResourceBundle");
                 }
             } catch (ClassNotFoundException e) {
+                LOGGER.trace("Class not found", e);
             }
         } else if (format.equals("java.properties")) {
             final String resourceName = toResourceName(bundleName, "properties");
             final ClassLoader classLoader = loader;
             final boolean reloadFlag = reload;
-            InputStream stream = null;
+            InputStream stream;
             try {
-                stream = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
-                    public InputStream run() throws IOException {
-                        InputStream is = null;
-                        if (reloadFlag) {
-                            URL url = classLoader.getResource(resourceName);
-                            if (url != null) {
-                                URLConnection connection = url.openConnection();
-                                if (connection != null) {
-                                    // Disable caches to get fresh data
-                                    // for
-                                    // reloading.
-                                    connection.setUseCaches(false);
-                                    is = connection.getInputStream();
-                                }
+                stream = AccessController.doPrivileged((PrivilegedExceptionAction<InputStream>) () -> {
+                    InputStream is = null;
+                    if (reloadFlag) {
+                        URL url = classLoader.getResource(resourceName);
+                        if (url != null) {
+                            URLConnection connection = url.openConnection();
+                            if (connection != null) {
+                                // Disable caches to get fresh data
+                                // for
+                                // reloading.
+                                connection.setUseCaches(false);
+                                is = connection.getInputStream();
                             }
-                        } else {
-                            is = classLoader.getResourceAsStream(resourceName);
                         }
-                        return is;
+                    } else {
+                        is = classLoader.getResourceAsStream(resourceName);
                     }
+                    return is;
                 });
             } catch (PrivilegedActionException e) {
                 throw (IOException) e.getException();

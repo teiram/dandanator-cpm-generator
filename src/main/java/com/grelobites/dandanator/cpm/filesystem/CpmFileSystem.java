@@ -45,11 +45,10 @@ public class CpmFileSystem implements FileSystem {
     }
 
     private boolean isArchiveNameConflict(Archive archive) {
-        return archiveList.stream().filter(item ->
+        return archiveList.stream().anyMatch(item ->
                 item.getName().trim().equals(archive.getName().trim()) &&
-                item.getExtension().trim().equals(archive.getExtension().trim()) &&
-                item.getUserArea() == archive.getUserArea())
-                .count() > 0;
+                        item.getExtension().trim().equals(archive.getExtension().trim()) &&
+                        item.getUserArea() == archive.getUserArea());
     }
 
     @Override
@@ -140,8 +139,8 @@ public class CpmFileSystem implements FileSystem {
                     entry.getName().equals(e.getName()) &&
                             entry.getExtension().equals(e.getExtension()) &&
                             entry.getUserArea() == e.getUserArea())
+                    .sorted(Comparator.comparingInt(CpmDirectoryEntry::getExtent))
                     .collect(Collectors.toList());
-            fileExtents.sort(Comparator.comparingInt(CpmDirectoryEntry::getExtent));
             LOGGER.debug("File has " + fileExtents.size() + " extents");
             if (extentNumber == fileExtents.get(0).getExtent()) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();

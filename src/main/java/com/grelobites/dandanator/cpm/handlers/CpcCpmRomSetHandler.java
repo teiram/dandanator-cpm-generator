@@ -2,7 +2,6 @@ package com.grelobites.dandanator.cpm.handlers;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
-import com.grelobites.dandanator.cpm.Preferences;
 import com.grelobites.dandanator.cpm.filesystem.CpmFileSystem;
 import com.grelobites.dandanator.cpm.model.Archive;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;

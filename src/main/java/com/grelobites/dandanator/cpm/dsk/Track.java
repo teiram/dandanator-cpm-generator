@@ -25,7 +25,7 @@ public class Track {
     public List<Integer> orderedSectorList() {
         return Stream.of(trackInformationBlock.getSectorInformationList())
                 .sorted(Comparator.comparingInt(SectorInformationBlock::getSectorId))
-                .map(e -> e.getPhysicalPosition())
+                .map(SectorInformationBlock::getPhysicalPosition)
                 .collect(Collectors.toList());
     }
 

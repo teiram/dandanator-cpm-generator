@@ -6,8 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.io.IOException;
-
 public class AboutController {
 
     @FXML
@@ -17,7 +15,7 @@ public class AboutController {
     private Label versionLabel;
 
     @FXML
-    private void initialize() throws IOException {
+    private void initialize()  {
         logo.setImage(new Image(AboutController.class.getResourceAsStream("/app-icon.png")));
         versionLabel.setText(String.format("Version %s", Constants.currentVersion()));
     }

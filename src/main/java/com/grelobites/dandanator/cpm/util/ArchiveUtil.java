@@ -27,9 +27,8 @@ public class ArchiveUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveUtil.class);
 
     private static final Set<Character> INVALID_CPM_CHARS = new HashSet<>(Arrays.asList(
-            new Character[] {
             '<', '>', '.', ',', ';',
-            ':' ,'=' ,'?', '*', '[', ']'}));
+            ':','=','?', '*', '[', ']'));
 
     private static final char REPLACEMENT_CPM_CHAR = '_';
 
@@ -55,7 +54,7 @@ public class ArchiveUtil {
         if (suffix != null) {
             candidateName += suffix;
         }
-        return new Pair(candidateName, candidateExtension);
+        return new Pair<>(candidateName, candidateExtension);
     }
 
     public static boolean isNameInUseAtUserArea(Pair<String, String> name, int userArea, ApplicationContext context) {
@@ -97,9 +96,9 @@ public class ArchiveUtil {
 
     public static Archive createArchiveFromFile(File file, ApplicationContext context) throws IOException {
         Pair<String, String> name = calculateArchiveName(file, context);
-        Archive archive = new Archive(name.left(), name.right(), context.getCurrentUserArea(),
+        return new Archive(name.left(),
+                name.right(), context.getCurrentUserArea(),
                 Files.readAllBytes(file.toPath()));
-        return archive;
     }
 
     private static CpmFileSystem getFileSystemFromDsk(byte[] data) throws IOException {

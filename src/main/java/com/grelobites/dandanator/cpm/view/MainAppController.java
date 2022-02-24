@@ -9,17 +9,24 @@ import com.grelobites.dandanator.cpm.model.ArchiveOperationException;
 import com.grelobites.dandanator.cpm.model.RomSetHandler;
 import com.grelobites.dandanator.cpm.util.ArchiveUtil;
 import com.grelobites.dandanator.cpm.util.LocaleUtil;
-import com.grelobites.dandanator.cpm.util.OperationResult;
 import com.grelobites.dandanator.cpm.util.Util;
 import com.grelobites.dandanator.cpm.view.util.DialogUtil;
 import com.grelobites.dandanator.cpm.view.util.DirectoryAwareFileChooser;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -30,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -219,7 +225,7 @@ public class MainAppController {
             TableRow<Archive> row = new TableRow<>();
             row.setOnDragDetected(event -> {
                 if (!row.isEmpty()) {
-                    Integer index = row.getIndex();
+                    int index = row.getIndex();
                     LOGGER.debug("Dragging content of row " + index);
                     Dragboard db = row.startDragAndDrop(TransferMode.ANY);
                     db.setDragView(row.snapshot(null, null));
@@ -234,9 +240,7 @@ public class MainAppController {
                 }
             });
 
-            row.setOnDragDone(event -> {
-                event.consume();
-            });
+            row.setOnDragDone(Event::consume);
 
             row.setOnMouseClicked(e -> {
                 if (row.isEmpty()) {
@@ -302,7 +306,7 @@ public class MainAppController {
         createRomButton.setOnAction(c -> {
             DirectoryAwareFileChooser chooser = applicationContext.getFileChooser();
             chooser.setTitle(LocaleUtil.i18n("saveRomSet"));
-            chooser.setInitialFileName("dandanator_cpm_" + Constants.currentVersion() + ".rom");
+            chooser.setInitialFileName(Preferences.getInstance().getDefaultExportFilename());
             final File saveFile = chooser.showSaveDialog(createRomButton.getScene().getWindow());
             if (saveFile != null) {
                 try (FileOutputStream fos = new FileOutputStream(saveFile)) {
@@ -354,20 +358,14 @@ public class MainAppController {
         diskResources.setTooltip(diskResourcesDetail);
         diskResourcesDetail.textProperty().bind(applicationContext.romUsageDetailProperty());
         icon.setImage(Preferences.getInstance().getHandlerType().icon());
-        Preferences.getInstance().handlerTypeProperty().addListener((e, oldValue, newValue) -> {
-            icon.setImage(newValue.icon());
-        });
+        Preferences.getInstance().handlerTypeProperty().addListener((e, oldValue, newValue) -> icon.setImage(newValue.icon()));
     }
 
     private void onArchiveSelection(Archive oldArchive, Archive newArchive) {
         LOGGER.debug("onArchiveSelection oldArchive=" + oldArchive + ", newArchive=" + newArchive);
         archiveView.bindToArchive(newArchive);
         archiveInformationPane.setDisable(newArchive == null);
-        if (newArchive == null) {
-            removeSelectedArchiveButton.setDisable(true);
-        } else {
-            removeSelectedArchiveButton.setDisable(false);
-        }
+        removeSelectedArchiveButton.setDisable(newArchive == null);
     }
 
 }
