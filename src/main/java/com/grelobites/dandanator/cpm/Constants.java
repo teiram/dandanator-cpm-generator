@@ -52,13 +52,24 @@ public class Constants {
 
     public static final FileSystemParameters CPC_ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
-                    .withBlockCount(233)
+                    .withBlockCount(234)
                     .withBlockSize(2048)
                     .withDirectoryEntries(128)
                     .withSectorsByTrack(9)
-                    .withTrackCount(99)
+                    .withTrackCount(104)
                     .withSectorSize(512)
                     .withReservedTracks(2)
+                    .build();
+
+    public static final FileSystemParameters CPCPLUS_ROMSET_FS_PARAMETERS =
+            FileSystemParameters.newBuilder()
+                    .withBlockCount(238)
+                    .withBlockSize(2048)
+                    .withDirectoryEntries(128)
+                    .withSectorsByTrack(9)
+                    .withTrackCount(106)
+                    .withSectorSize(512)
+                    .withReservedTracks(0)
                     .build();
 
     public static final FileSystemParameters PLUS3_FS_PARAMETERS =

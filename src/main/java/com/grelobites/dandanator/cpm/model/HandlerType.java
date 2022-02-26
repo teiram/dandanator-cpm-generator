@@ -2,13 +2,15 @@ package com.grelobites.dandanator.cpm.model;
 
 import com.grelobites.dandanator.cpm.ApplicationContext;
 import com.grelobites.dandanator.cpm.Constants;
-import com.grelobites.dandanator.cpm.handlers.CpcCpmRomSetHandler;
+import com.grelobites.dandanator.cpm.handlers.CpcCpm22RomSetHandler;
+import com.grelobites.dandanator.cpm.handlers.CpcCpmPlusRomSetHandler;
 import com.grelobites.dandanator.cpm.handlers.SpectrumCpmRomSetHandler;
 import javafx.scene.image.Image;
 
 public enum HandlerType {
     SPECTRUM(SpectrumCpmRomSetHandler.class, Constants.SPECTRUM_ICON),
-    CPC(CpcCpmRomSetHandler.class, Constants.CPC_ICON);
+    CPC(CpcCpm22RomSetHandler.class, Constants.CPC_ICON),
+    CPC_CPMPLUS(CpcCpmPlusRomSetHandler.class, Constants.CPC_ICON);
 
 
     private Class<? extends RomSetHandler> handlerClass;
