@@ -50,6 +50,10 @@ public class DiskInformationBlock {
         return trackCount;
     }
 
+    public void setTrackCount(int trackCount) {
+        this.trackCount = trackCount;
+    }
+
     public int getSideCount() {
         return sideCount;
     }
