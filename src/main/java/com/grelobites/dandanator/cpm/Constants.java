@@ -73,7 +73,7 @@ public class Constants {
                     .withSectorsByTrack(9)
                     .withTrackCount(106)
                     .withSectorSize(512)
-                    .withReservedTracks(2)
+                    .withReservedTracks(0)
                     .build();
 
     public static final FileSystemParameters PLUS3_FS_PARAMETERS =
