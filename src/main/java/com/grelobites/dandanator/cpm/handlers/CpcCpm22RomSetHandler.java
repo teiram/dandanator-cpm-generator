@@ -39,14 +39,6 @@ public class CpcCpm22RomSetHandler extends CpcCpmRomSetHandlerBase implements Ro
     }
 
     @Override
-    public void importRomSet(InputStream romset) throws IOException {
-        LOGGER.debug("importRomSet " + romset);
-        fileSystem.clear();
-        applicationContext.getArchiveList().clear();
-        mergeRomSet(romset);
-    }
-
-    @Override
     public void exportRomSet(OutputStream romset) throws IOException {
         LOGGER.debug("exportRomSet " + romset);
 

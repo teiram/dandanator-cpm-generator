@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class CpcCpmRomSetHandlerBase {
+public abstract class CpcCpmRomSetHandlerBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(CpcCpmRomSetHandlerBase.class);
 
     protected ApplicationContext applicationContext;
@@ -75,6 +76,14 @@ public class CpcCpmRomSetHandlerBase {
         for (int i = 0; i < size; i++) {
             os.write(value);
         }
+    }
+
+    public abstract void mergeRomSet(InputStream romset) throws IOException;
+
+    public void importRomSet(InputStream romset) throws IOException {
+        LOGGER.debug("importRomSet " + romset);
+        clear();
+        mergeRomSet(romset);
     }
 
     public void removeArchive(Archive archive) {

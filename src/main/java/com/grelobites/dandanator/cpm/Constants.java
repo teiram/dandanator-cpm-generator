@@ -43,13 +43,12 @@ public class Constants {
                     .withSectorSize(512)
                     .withReservedTracks(2)
                     .build();
-    // 9 * 512 = 4608 bytes per track
-    // 4096 as scratch buffer (slot 0?)
-    // Write procedure:
-    // - Erase the scratch buffer
-    // - Load sector by sector of 512 bytes using the source, except the one to write (7 sectors) - They could be on different sector
-    // - Load the sector to be modified 475.136
 
+    // Total size: 524288
+    // Reserved slots: 32768
+    // Size for the filesystem: 491520
+    // Number of tracks: 491520 / (9 * 512) = 491520 / 4608 = 106 tracks - 2 reserved tracks = 104 tracks
+    // Block count = 104 tracks * 4608 bytes/ track = 479232 bytes = 234 blocks
     public static final FileSystemParameters CPC_ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
                     .withBlockCount(234)
@@ -61,6 +60,11 @@ public class Constants {
                     .withReservedTracks(2)
                     .build();
 
+    // Total size: 524288
+    // Reserved slots: 32768
+    // Size for the filesystem: 491520
+    // Number of tracks: 491520 / (9 * 512) = 491520 / 4608 = 106 tracks  = 106 tracks
+    // Block count = 106 tracks * 4608 bytes/ track = 488448 bytes = 238,5 blocks
     public static final FileSystemParameters CPCPLUS_ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
                     .withBlockCount(238)
@@ -69,7 +73,7 @@ public class Constants {
                     .withSectorsByTrack(9)
                     .withTrackCount(106)
                     .withSectorSize(512)
-                    .withReservedTracks(0)
+                    .withReservedTracks(2)
                     .build();
 
     public static final FileSystemParameters PLUS3_FS_PARAMETERS =
