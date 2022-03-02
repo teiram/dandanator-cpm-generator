@@ -122,6 +122,11 @@ public class PreferencesController {
                 });
     }
 
+    private void updateBootImageControl(HandlerType handlerType) {
+        boolean bootImageDisabled = handlerType != HandlerType.SPECTRUM;
+        changeBootImageButton.setDisable(bootImageDisabled);
+        resetBootImageButton.setDisable(bootImageDisabled);
+    }
     @FXML
     private void initialize() throws IOException {
         initializeImages();
@@ -133,8 +138,10 @@ public class PreferencesController {
         ));
 
         handlerTypeChoiceBox.getSelectionModel().select(Preferences.getInstance().getHandlerType());
-        handlerTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((e, oldValue, newValue) ->
-                Preferences.getInstance().setHandlerType(newValue));
-
+        updateBootImageControl(Preferences.getInstance().getHandlerType());
+        handlerTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((e, oldValue, newValue) -> {
+            Preferences.getInstance().setHandlerType(newValue);
+            updateBootImageControl(newValue);
+        });
     }
 }

@@ -58,7 +58,7 @@
                                  <children>
                                     <ImageView fx:id="icon" fitHeight="31.0" fitWidth="78.0">
                                        <image>
-                                          <Image url="@/color-logo.png" />
+                                          <Image url="@/logo-spectrum.png" />
                                        </image>
                                        <HBox.margin>
                                           <Insets />

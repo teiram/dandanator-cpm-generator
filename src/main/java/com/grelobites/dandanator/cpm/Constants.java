@@ -28,8 +28,9 @@ public class Constants {
 	public static final String GREEN_BACKGROUND_STYLE = "green-background";
 	public static final String NORMAL_BACKGROUND_STYLE = "normal-background";
 
-    public static final Image SPECTRUM_ICON = new Image(Constants.class.getResourceAsStream("/color-logo.png"));
-    public static final Image CPC_ICON = new Image(Constants.class.getResourceAsStream("/color-logo-cpc.png"));
+    public static final Image SPECTRUM_ICON = new Image(Constants.class.getResourceAsStream("/logo-spectrum.png"));
+    public static final Image CPC464_ICON = new Image(Constants.class.getResourceAsStream("/logo-464.png"));
+    public static final Image CPC6128_ICON = new Image(Constants.class.getResourceAsStream("/logo-6128.png"));
 
 
 
