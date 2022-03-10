@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,12 +65,12 @@ public class ArchiveUtil {
                 a.getExtension().equals(name.right())).size() > 0;
     }
 
-    public static Pair<String, String> calculateArchiveName(File file, ApplicationContext context) {
-        Pair<String, String> candidate = getBestName(file.getName());
+    public static Pair<String, String> calculateArchiveName(String fileName, ApplicationContext context) {
+        Pair<String, String> candidate = getBestName(fileName);
         int index = 0;
         while (isNameInUseAtUserArea(candidate, context.getCurrentUserArea(), context)) {
             LOGGER.info("Name " + candidate + " already in use");
-            candidate = getBestNameWithSuffix(file.getName(), String.format("%02d", index++));
+            candidate = getBestNameWithSuffix(fileName, String.format("%02d", index++));
         }
         return candidate;
     }
@@ -83,19 +84,27 @@ public class ArchiveUtil {
 
     public static FileType guessFileType(File file) {
         //TODO: Implement properly for DSK and ROMSET detection
-        if (file.getName().endsWith(".raw")) {
+        if (file.getName().toLowerCase().endsWith(".raw")) {
             return FileType.RAWFS;
-        } else if (file.getName().endsWith(".dsk") && DskUtil.isDskFile(file)) {
+        } else if (file.getName().toLowerCase().endsWith(".dsk") && DskUtil.isDskFile(file)) {
             return FileType.DSK;
-        } else if (file.getName().endsWith(".rom") && file.length() == Constants.ROMSET_SIZE) {
+        } else if (file.getName().toLowerCase().endsWith(".rom") && file.length() == Constants.ROMSET_SIZE) {
             return FileType.ROMSET;
         } else {
             return FileType.ARCHIVE;
         }
     }
 
+    public static Archive createArchiveFromStream(String fileName, InputStream stream,
+                                                  ApplicationContext context) throws IOException {
+        Pair<String, String> name = calculateArchiveName(fileName, context);
+        return new Archive(name.left(),
+                name.right(), context.getCurrentUserArea(),
+                Util.fromInputStream(stream));
+    }
+
     public static Archive createArchiveFromFile(File file, ApplicationContext context) throws IOException {
-        Pair<String, String> name = calculateArchiveName(file, context);
+        Pair<String, String> name = calculateArchiveName(file.getName(), context);
         return new Archive(name.left(),
                 name.right(), context.getCurrentUserArea(),
                 Files.readAllBytes(file.toPath()));

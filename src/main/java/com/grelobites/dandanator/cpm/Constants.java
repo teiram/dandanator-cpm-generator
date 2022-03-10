@@ -32,7 +32,54 @@ public class Constants {
     public static final Image CPC464_ICON = new Image(Constants.class.getResourceAsStream("/logo-464.png"));
     public static final Image CPC6128_ICON = new Image(Constants.class.getResourceAsStream("/logo-6128.png"));
 
+    public static final String CPC_CPM22_RESOURCES_PATH = "/cpc/cpm22/";
+    public static final String CPC_CPMPLUS_RESOURCES_PATH = "/cpc/cpmplus/";
 
+    public static final String[] CPC_CPM22_RESOURCE_NAMES = {
+            "BOOTGEN.COM",
+            "CLOAD.COM",
+            "CSAVE.COM",
+            "DDT.COM",
+            "DRLKEYS.COM",
+            "DUMP.COM",
+            "ED.COM",
+            "FILECOPY.COM",
+            "LOAD.COM",
+            "MOVCPM.COM",
+            "PIP.COM",
+            "SETUP.COM",
+            "STAT.COM",
+            "SUBMIT.COM",
+            "SYSGEN.COM",
+            "XSUB.COM"
+    };
+
+    public static final String[] CPC_CPMPLUS_RESOURCE_NAMES = {
+            "DATE.COM",
+            "DEVICE.COM",
+            "DIR.COM",
+            "DISCKIT3.COM",
+            "ED.COM",
+            "ERASE.COM",
+            "GET.COM",
+            "KEYS.CCP",
+            "KEYS.WP",
+            "LANGUAGE.COM",
+            "PALETTE.COM",
+            "PIP.COM",
+            "PROFILE.ENG",
+            "PUT.COM",
+            "RENAME.COM",
+            "SET24X80.COM",
+            "SET.COM",
+            "SETDEF.COM",
+            "SETKEYS.COM",
+            "SETLST.COM",
+            "SETSIO.COM",
+            "SHOW.COM",
+            "SUBMIT.COM",
+            "TYPE.COM"
+    };
 
     public static final FileSystemParameters ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()

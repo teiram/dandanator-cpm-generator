@@ -44,7 +44,8 @@ public class MainApp extends Application {
         fileMenu.getItems().addAll(
                 importRomSetMenuItem(scene, applicationContext),
                 mergeRomSetMenuItem(scene, applicationContext),
-                exportInstallableMenuItem(applicationContext));
+                exportInstallableMenuItem(applicationContext),
+                addSystemUtilitiesMenuItem(applicationContext));
 
         if (menuToolkit == null) {
             fileMenu.getItems().add(new SeparatorMenuItem());
@@ -124,6 +125,22 @@ public class MainApp extends Application {
             }
         });
         return importRomSet;
+    }
+
+    private MenuItem addSystemUtilitiesMenuItem(ApplicationContext applicationContext) {
+        MenuItem addSystemUtilitiesMenuItem = new MenuItem(LocaleUtil.i18n("addSystemUtilitiesMenuEntry"));
+        addSystemUtilitiesMenuItem.setAccelerator(
+                KeyCombination.keyCombination("SHORTCUT+S")
+        );
+
+        addSystemUtilitiesMenuItem.setOnAction(f -> {
+            try {
+               applicationContext.addSystemArchives();
+            } catch (Exception e) {
+                LOGGER.error("Adding system utilities", e);
+            }
+        });
+        return addSystemUtilitiesMenuItem;
     }
 
 	public static void main(String[] args) {

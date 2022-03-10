@@ -194,6 +194,18 @@ public class ApplicationContext {
         this.userFilter = userFilter;
     }
 
+    public void addSystemArchives() {
+        String basePath = romSetHandler.getSystemArchivePath();
+        romSetHandler.getSystemArchives().forEach(fileName -> {
+           try (InputStream is = ApplicationContext.class.getResourceAsStream(
+                   String.format("%s%s", basePath, fileName))) {
+               romSetHandler.addArchive(ArchiveUtil.createArchiveFromStream(fileName, is, this));
+           } catch (IOException ioe) {
+              LOGGER.error("Unable to get file for resource {} on path {}", fileName, basePath, ioe);
+           }
+        });
+    }
+
     public int getCurrentUserArea() {
         return userFilter.isDisable() ? 0 : userFilter.getUserArea();
     }

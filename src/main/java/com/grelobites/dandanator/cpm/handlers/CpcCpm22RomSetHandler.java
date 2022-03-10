@@ -14,7 +14,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CpcCpm22RomSetHandler extends CpcCpmRomSetHandlerBase implements RomSetHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CpcCpm22RomSetHandler.class);
@@ -82,5 +85,16 @@ public class CpcCpm22RomSetHandler extends CpcCpmRomSetHandlerBase implements Ro
                 Constants.SLOT_SIZE * 30 - (systemTracks.length + fsByteArray.length));
         romset.flush();
 
+    }
+
+    @Override
+    public String getSystemArchivePath() {
+        return Constants.CPC_CPM22_RESOURCES_PATH;
+    }
+
+    @Override
+    public List<String> getSystemArchives() {
+        return Stream.of(Constants.CPC_CPM22_RESOURCE_NAMES)
+                .collect(Collectors.toList());
     }
 }

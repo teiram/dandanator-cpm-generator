@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CpcCpmPlusRomSetHandler extends CpcCpmRomSetHandlerBase implements RomSetHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CpcCpmPlusRomSetHandler.class);
@@ -53,5 +56,16 @@ public class CpcCpmPlusRomSetHandler extends CpcCpmRomSetHandlerBase implements 
                 Constants.SLOT_SIZE * 30 - fsByteArray.length);
         romset.flush();
 
+    }
+
+    @Override
+    public String getSystemArchivePath() {
+        return Constants.CPC_CPMPLUS_RESOURCES_PATH;
+    }
+
+    @Override
+    public List<String> getSystemArchives() {
+        return Stream.of(Constants.CPC_CPMPLUS_RESOURCE_NAMES)
+                .collect(Collectors.toList());
     }
 }

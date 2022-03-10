@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Collections;
+import java.util.List;
 
 public class SpectrumCpmRomSetHandler implements RomSetHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpectrumCpmRomSetHandler.class);
@@ -155,5 +157,15 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
     public void clear() {
         fileSystem.clear();
         applicationContext.getArchiveList().clear();
+    }
+
+    @Override
+    public String getSystemArchivePath() {
+        return null;
+    }
+
+    @Override
+    public List<String> getSystemArchives() {
+        return Collections.emptyList();
     }
 }
