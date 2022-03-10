@@ -108,10 +108,21 @@ public class Preferences {
     }
 
     private static Preferences setFromPreferences(Preferences preferences) {
-        java.util.prefs.Preferences p = getApplicationPreferences();
-        preferences.setBootImagePath(p.get(BOOTIMAGEPATH_PROPERTY, null));
-        preferences.setHandlerType(HandlerType.valueOf(p.get(HANDLERTYPE_PROPERTY, HandlerType.SPECTRUM.name())));
-        return preferences;
+        try {
+            java.util.prefs.Preferences p = getApplicationPreferences();
+            preferences.setBootImagePath(p.get(BOOTIMAGEPATH_PROPERTY, null));
+            preferences.setHandlerType(HandlerType.valueOf(p.get(HANDLERTYPE_PROPERTY, HandlerType.SPECTRUM.name())));
+            return preferences;
+        } catch (Exception e) {
+            LOGGER.warn("Cleaning preferences on read failure", e);
+            try {
+                getApplicationPreferences().clear();
+            } catch (Exception ec) {
+                LOGGER.error("Cleaning preferences", ec);
+            }
+            //Hopefully we don´t enter a loop here ;-)
+            return setFromPreferences(preferences);
+        }
     }
 
     public static void persistConfigurationValue(String key, String value) {
