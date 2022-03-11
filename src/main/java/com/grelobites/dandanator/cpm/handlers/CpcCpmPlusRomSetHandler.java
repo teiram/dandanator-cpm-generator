@@ -65,7 +65,6 @@ public class CpcCpmPlusRomSetHandler extends CpcCpmRomSetHandlerBase implements 
 
     @Override
     public List<String> getSystemArchives() {
-        return Stream.of(Constants.CPC_CPMPLUS_RESOURCE_NAMES)
-                .collect(Collectors.toList());
+        return Constants.CPC_CPMPLUS_RESOURCE_NAMES;
     }
 }

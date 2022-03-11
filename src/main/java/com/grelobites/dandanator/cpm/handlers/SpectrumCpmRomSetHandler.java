@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
     private CpmFileSystem fileSystem;
 
     private InvalidationListener romUsageUpdater = e -> updateRomUsage();
+
+
 
     public SpectrumCpmRomSetHandler(ApplicationContext context) {
         this.applicationContext = context;
@@ -89,7 +92,7 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
     public void exportRomSet(OutputStream romset) throws IOException {
         LOGGER.debug("exportRomSet " + romset);
         ByteBuffer buffer = ByteBuffer.wrap(Util.fromInputStream(SpectrumCpmRomSetHandler.class
-                .getResourceAsStream("/loader.bin")));
+                .getResourceAsStream("/spectrum/loader.bin")));
         buffer.order(ByteOrder.LITTLE_ENDIAN).position(4);
         buffer.putShort(Integer.valueOf(1).shortValue()); //TODO: Set proper version here
 
@@ -97,7 +100,7 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
         LOGGER.debug("Writing driver at offset " + offset);
 
         byte[] driver = Util.fromInputStream(SpectrumCpmRomSetHandler.class
-            .getResourceAsStream("/dandanator_fid_driver.bin"));
+            .getResourceAsStream("/spectrum/dandanator_fid_driver.bin"));
         buffer.putShort(Integer.valueOf(offset).shortValue());
         buffer.putShort(Integer.valueOf(driver.length).shortValue());
 
@@ -111,7 +114,7 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
         offset += screen.length;
 
         byte[] kloaderScreen = Util.fromInputStream(SpectrumCpmRomSetHandler.class
-            .getResourceAsStream("/loader-screen.scr.zx7"));
+            .getResourceAsStream("/spectrum/loader-screen.scr.zx7"));
         buffer.putShort(Integer.valueOf(offset).shortValue());
 
         romset.write(buffer.array());
@@ -161,11 +164,11 @@ public class SpectrumCpmRomSetHandler implements RomSetHandler {
 
     @Override
     public String getSystemArchivePath() {
-        return null;
+        return Constants.SPECTRUM_CPMPLUS_RESOURCES_PATH;
     }
 
     @Override
     public List<String> getSystemArchives() {
-        return Collections.emptyList();
+        return Constants.SPECTRUM_CPMPLUS_RESOURCE_NAMES;
     }
 }

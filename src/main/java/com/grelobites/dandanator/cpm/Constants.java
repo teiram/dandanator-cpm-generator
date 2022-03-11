@@ -5,10 +5,12 @@ import com.grelobites.dandanator.cpm.util.Util;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Constants {
-    private static final String DEFAULT_VERSION = "2.0";
+    private static final String DEFAULT_VERSION = "2.1";
 
     public static final int SLOT_SIZE = 0x4000;
     public static final int MAX_EMS_FILE_SIZE = 0x4000 * 2;
@@ -34,52 +36,31 @@ public class Constants {
 
     public static final String CPC_CPM22_RESOURCES_PATH = "/cpc/cpm22/";
     public static final String CPC_CPMPLUS_RESOURCES_PATH = "/cpc/cpmplus/";
+    public static final String SPECTRUM_CPMPLUS_RESOURCES_PATH = "/spectrum/cpmplus/";
 
-    public static final String[] CPC_CPM22_RESOURCE_NAMES = {
-            "BOOTGEN.COM",
-            "CLOAD.COM",
-            "CSAVE.COM",
-            "DDT.COM",
-            "DRLKEYS.COM",
-            "DUMP.COM",
-            "ED.COM",
-            "FILECOPY.COM",
-            "LOAD.COM",
-            "MOVCPM.COM",
-            "PIP.COM",
-            "SETUP.COM",
-            "STAT.COM",
-            "SUBMIT.COM",
-            "SYSGEN.COM",
+    public static final List<String> CPC_CPM22_RESOURCE_NAMES = Arrays.asList(
+            "BOOTGEN.COM",     "CLOAD.COM",       "CSAVE.COM",      "DDT.COM",      "DRLKEYS.COM",
+            "DUMP.COM",        "ED.COM",          "FILECOPY.COM",   "LOAD.COM",     "MOVCPM.COM",
+            "PIP.COM",         "SETUP.COM",       "STAT.COM",       "SUBMIT.COM",   "SYSGEN.COM",
             "XSUB.COM"
-    };
+    );
 
-    public static final String[] CPC_CPMPLUS_RESOURCE_NAMES = {
-            "DATE.COM",
-            "DEVICE.COM",
-            "DIR.COM",
-            "DISCKIT3.COM",
-            "ED.COM",
-            "ERASE.COM",
-            "GET.COM",
-            "KEYS.CCP",
-            "KEYS.WP",
-            "LANGUAGE.COM",
-            "PALETTE.COM",
-            "PIP.COM",
-            "PROFILE.ENG",
-            "PUT.COM",
-            "RENAME.COM",
-            "SET24X80.COM",
-            "SET.COM",
-            "SETDEF.COM",
-            "SETKEYS.COM",
-            "SETLST.COM",
-            "SETSIO.COM",
-            "SHOW.COM",
-            "SUBMIT.COM",
+    public static final List<String> CPC_CPMPLUS_RESOURCE_NAMES = Arrays.asList(
+            "DATE.COM",      "DEVICE.COM",      "DIR.COM",      "DISCKIT3.COM",     "ED.COM",
+            "ERASE.COM",     "GET.COM",         "KEYS.CCP",     "KEYS.WP",          "LANGUAGE.COM",
+            "PALETTE.COM",   "PIP.COM",         "PROFILE.ENG",  "PUT.COM",          "RENAME.COM",
+            "SET24X80.COM",  "SET.COM",         "SETDEF.COM",   "SETKEYS.COM",      "SETLST.COM",
+            "SETSIO.COM",    "SHOW.COM",        "SUBMIT.COM",   "TYPE.COM"
+    );
+
+    public static final List<String> SPECTRUM_CPMPLUS_RESOURCE_NAMES = Arrays.asList(
+            "BASIC.COM",    "DEVICE.COM",   "DIR.COM",      "DISCKIT.COM",  "DUMP.COM",
+            "ED.COM",       "ERASE.COM",    "LANGUAGE.COM", "PALETTE.COM",  "PIP.COM",
+            "PROFILE.SUB",  "RAMDISC.FID",  "RENAME.COM",   "RESET.KEY",    "RPED.BAS",
+            "RPED.SUB",     "SET24X80.COM", "SET.COM",      "SETDEF.COM",   "SETKEYS.COM",
+            "SETLST.COM",   "SETSIO.COM",   "SHOW.COM",     "SUBMIT.COM",   "TIMEOUT.COM",
             "TYPE.COM"
-    };
+    );
 
     public static final FileSystemParameters ROMSET_FS_PARAMETERS =
             FileSystemParameters.newBuilder()
@@ -158,8 +139,8 @@ public class Constants {
                     .build();
 
 
-    private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "bootImage.scr";
-    private static final String EMS_FILE_RESOURCE = "S10CPM3.EMS";
+    private static final String DEFAULT_BOOT_IMAGE_RESOURCE = "spectrum/bootImage.scr";
+    private static final String EMS_FILE_RESOURCE = "spectrum/S10CPM3.EMS";
     private static final String THEME_RESOURCE = "view/theme.css";
     public static final int ROMSET_HEADER_SIZE = 4;
     public static final byte[] ROMSET_HEADER = new byte[] {(byte) 0xF3, (byte) 0xC3, (byte) 0x00, (byte) 0x01};

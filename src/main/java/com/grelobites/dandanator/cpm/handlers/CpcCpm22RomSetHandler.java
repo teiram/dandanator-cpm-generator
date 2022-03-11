@@ -94,7 +94,6 @@ public class CpcCpm22RomSetHandler extends CpcCpmRomSetHandlerBase implements Ro
 
     @Override
     public List<String> getSystemArchives() {
-        return Stream.of(Constants.CPC_CPM22_RESOURCE_NAMES)
-                .collect(Collectors.toList());
+        return Constants.CPC_CPM22_RESOURCE_NAMES;
     }
 }
